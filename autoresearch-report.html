@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autoresearch Skill — 종합 분석 보고서</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232736;
+    --border: #2e3348;
+    --text: #e0e0e8;
+    --text-dim: #8b8fa4;
+    --accent: #6c8cff;
+    --accent-dim: #3d5299;
+    --green: #34d399;
+    --green-dim: #065f46;
+    --red: #f87171;
+    --red-dim: #7f1d1d;
+    --yellow: #fbbf24;
+    --yellow-dim: #78350f;
+    --orange: #fb923c;
+    --purple: #a78bfa;
+    --cyan: #22d3ee;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #1a1d27 0%, #0f1117 50%, #1a1040 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    text-align: center;
+  }
+  .hero h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #6c8cff, #a78bfa, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .hero .subtitle {
+    color: var(--text-dim);
+    font-size: 1.05rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .hero .meta {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .hero .meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* Container */
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+  /* Section */
+  .section { margin-bottom: 48px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-header .icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .section-header .badge {
+    margin-left: auto;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  /* Cards */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--accent-dim); }
+  .card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card p, .card li {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    line-height: 1.65;
+  }
+  .card ul { padding-left: 18px; margin-top: 6px; }
+  .card li { margin-bottom: 4px; }
+  .card .severity {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .severity.critical { background: var(--red-dim); color: var(--red); }
+  .severity.high { background: #7f1d1d; color: #fca5a5; }
+  .severity.medium { background: var(--yellow-dim); color: var(--yellow); }
+  .severity.low { background: #1e3a5f; color: #93c5fd; }
+  .severity.fixed { background: var(--green-dim); color: var(--green); }
+
+  /* Full-width card */
+  .card-full {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  td {
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(108, 140, 255, 0.04); }
+
+  /* Simulation */
+  .timeline { position: relative; padding-left: 32px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -27px;
+    top: 24px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--bg);
+  }
+  .timeline-item.keep::before { background: var(--green); border-color: var(--green); }
+  .timeline-item.discard::before { background: var(--red); border-color: var(--red); }
+  .timeline-item.pivot::before { background: var(--yellow); border-color: var(--yellow); }
+  .timeline-item.setup::before { background: var(--accent); border-color: var(--accent); }
+  .timeline-item.session::before { background: var(--purple); border-color: var(--purple); }
+
+  .timeline-item .iter-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 8px;
+    text-transform: uppercase;
+  }
+  .iter-badge.keep { background: var(--green-dim); color: var(--green); }
+  .iter-badge.discard { background: var(--red-dim); color: var(--red); }
+  .iter-badge.pivot { background: var(--yellow-dim); color: var(--yellow); }
+  .iter-badge.setup { background: var(--accent-dim); color: var(--accent); }
+  .iter-badge.session { background: #3b0764; color: var(--purple); }
+
+  .timeline-item h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .timeline-item .phases {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .phase-box {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.82rem;
+  }
+  .phase-box .label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .phase-box code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.78rem;
+    color: var(--cyan);
+  }
+
+  /* Stat boxes */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-box .value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .stat-box .label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* Flow diagram */
+  .flow-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    overflow-x: auto;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .flow-node {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .flow-node.primary { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); }
+  .flow-node.success { background: var(--green-dim); color: var(--green); border: 1px solid #065f46; }
+  .flow-node.danger { background: var(--red-dim); color: var(--red); border: 1px solid #7f1d1d; }
+  .flow-node.warning { background: var(--yellow-dim); color: var(--yellow); border: 1px solid #78350f; }
+  .flow-node.neutral { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+  .flow-arrow { color: var(--text-dim); font-size: 1.1rem; }
+  .flow-arrow.down { display: block; text-align: center; margin: 4px 0; }
+
+  /* Tag */
+  .tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    background: var(--surface2);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+  .tag.best { background: var(--green-dim); color: var(--green); border-color: #065f46; }
+  .tag.good { background: #1e3a5f; color: #93c5fd; border-color: #1e3a5f; }
+  .tag.poor { background: var(--red-dim); color: #fca5a5; border-color: #7f1d1d; }
+
+  /* Risk meter */
+  .risk-meter {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--surface2);
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .risk-meter .fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+  .risk-meter .fill.high { background: var(--red); }
+  .risk-meter .fill.medium { background: var(--yellow); }
+  .risk-meter .fill.low { background: var(--green); }
+
+  /* TSV simulation */
+  .tsv-table {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.78rem;
+    overflow-x: auto;
+  }
+  .tsv-table td, .tsv-table th { padding: 6px 10px; white-space: nowrap; }
+  .tsv-table .status-keep { color: var(--green); font-weight: 600; }
+  .tsv-table .status-discard { color: var(--red); }
+  .tsv-table .status-crash { color: var(--orange); }
+  .tsv-table .status-baseline { color: var(--accent); }
+  .tsv-table .status-pivot { color: var(--yellow); }
+
+  /* Architecture diagram */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .arch-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 0.82rem;
+    text-align: center;
+  }
+  .arch-box .title {
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+  }
+  .arch-box .desc { color: var(--text-dim); font-size: 0.78rem; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero { padding: 40px 20px 30px; }
+    .hero h1 { font-size: 1.6rem; }
+    .container { padding: 24px 16px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .timeline-item .phases { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .arch-grid { grid-template-columns: 1fr; }
+    .hero .meta { flex-direction: column; align-items: center; gap: 8px; }
+  }
+
+  /* TOC */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 40px;
+  }
+  .toc h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 8px;
+  }
+  .toc a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.88rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: block;
+    transition: background 0.15s;
+  }
+  .toc a:hover { background: var(--surface2); }
+  .toc a .num { color: var(--text-dim); margin-right: 6px; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<div class="hero">
+  <h1>Autoresearch Skill 종합 분석 보고서</h1>
+  <p class="subtitle">Karpathy의 autoresearch 패턴을 일반화한 Claude Code 스킬의 모순/오류/개선점 분석, 위험 평가, 활용 범위 검토</p>
+  <div class="meta">
+    <span>2026-03-21</span>
+    <span>v1.0.0</span>
+    <span>파일 17개 분석</span>
+    <span>수정 8건 + 신규 4건</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>목차</h3>
+    <div class="toc-grid">
+      <a href="#simulation"><span class="num">1</span>실행 시뮬레이션</a>
+      <a href="#flow"><span class="num">2</span>핵심 루프 플로우</a>
+      <a href="#contradictions"><span class="num">3</span>모순 및 오류 (수정됨)</a>
+      <a href="#improvements"><span class="num">4</span>개선점</a>
+      <a href="#outcomes"><span class="num">5</span>기대 성과</a>
+      <a href="#risks"><span class="num">6</span>위험 요소</a>
+      <a href="#scope"><span class="num">7</span>코딩 활용 범위</a>
+      <a href="#architecture"><span class="num">8</span>아키텍처 구조</a>
+      <a href="#metric-enhancement"><span class="num">9</span>메트릭 향상 (NEW)</a>
+      <a href="#scope-enhancement"><span class="num">10</span>Scope 향상 (NEW)</a>
+    </div>
+  </div>
+
+  <!-- ===================== 1. SIMULATION ===================== -->
+  <div class="section" id="simulation">
+    <div class="section-header">
+      <div class="icon" style="background:var(--accent-dim);color:var(--accent);">&#9654;</div>
+      <h2>실행 시뮬레이션</h2>
+      <span class="badge" style="background:var(--accent-dim);color:var(--accent);">시나리오: 테스트 커버리지 증대</span>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-box">
+        <div class="value" style="color:var(--accent)">12</div>
+        <div class="label">Baseline</div>
+      </div>
+      <div class="stat-box">
+        <div class="value" style="color:var(--green)">34</div>
+        <div class="label">Final Metric</div>
+      </div>
+      <div class="stat-box">
+        <div class="value" style="color:var(--green)">+22</div>
+        <div class="label">Net Improvement</div>
+      </div>
+      <div class="stat-box">
+        <div class="value">20</div>
+        <div class="label">Iterations</div>
+      </div>
+      <div class="stat-box">
+        <div class="value" style="color:var(--green)">11</div>
+        <div class="label">Keeps</div>
+      </div>
+      <div class="stat-box">
+        <div class="value" style="color:var(--red)">8</div>
+        <div class="label">Discards</div>
+      </div>
+    </div>
+
+    <div class="timeline">
+
+      <!-- Setup -->
+      <div class="timeline-item setup">
+        <h3>
+          <span class="iter-badge setup">SETUP</span>
+          파라미터 확인 + 베이스라인 측정
+        </h3>
+        <div class="phases">
+          <div class="phase-box">
+            <div class="label">Goal</div>
+            테스트 통과 수 증가
+          </div>
+          <div class="phase-box">
+            <div class="label">Scope</div>
+            <code>tests/*.py</code> (3 files)
+          </div>
+          <div class="phase-box">
+            <div class="label">Verify</div>
+            <code>pytest --tb=short 2>&1</code>
+          </div>
+          <div class="phase-box">
+            <div class="label">Baseline</div>
+            <strong style="color:var(--accent)">12 passed</strong>
+          </div>
+        </div>
+        <p style="margin-top:12px;font-size:0.82rem;color:var(--text-dim)">
+          .gitignore 자동 설정 ✓ &nbsp;|&nbsp; results.tsv 생성 ✓ &nbsp;|&nbsp; state.json 생성 ✓<br>
+          <strong style="color:var(--yellow)">이 시점 이후 사용자에게 어떤 질문도 하지 않음. 완전 자율 모드.</strong>
+        </p>
+      </div>
+
+      <!-- Iteration 1 -->
+      <div class="timeline-item keep">
+        <h3>
+          <span class="iter-badge keep">KEEP +1</span>
+          Iteration 1 — 첫 실험 (Explore)
+        </h3>
+        <div class="phases">
+          <div class="phase-box">
+            <div class="label">Phase 2: Ideate</div>
+            Strategy: <strong>Explore</strong><br>
+            "parse()의 빈 문자열 테스트가 없다"
+          </div>
+          <div class="phase-box">
+            <div class="label">Phase 3: Modify</div>
+            <code>test_parse_empty_string()</code> 추가<br>
+            ONE atomic change ✓
+          </div>
+          <div class="phase-box">
+            <div class="label">Phase 4→5: Commit → Verify</div>
+            commit <em>before</em> verify<br>
+            <code>pytest</code> → <strong style="color:var(--green)">13 passed</strong>
+          </div>
+          <div class="phase-box">
+            <div class="label">Phase 6: Decide</div>
+            delta = 13 - 12 = <strong style="color:var(--green)">+1</strong><br>
+            ✅ KEEP → current_best = 13
+          </div>
+        </div>
+      </div>
+
+      <!-- Iteration 2 -->
+      <div class="timeline-item keep">
+        <h3>
+          <span class="iter-badge keep">KEEP +2</span>
+          Iteration 2 — 성공 전략 확장 (Exploit)
+        </h3>
+        <p style="font-size:0.85rem">
+          지난 keep 패턴(경계값 테스트)을 다른 함수에 적용 → <code>validate()</code> 경계값 테스트 추가 → <strong style="color:var(--green)">15 passed (+2)</strong>
+        </p>
+      </div>
+
+      <!-- Iteration 3 -->
+      <div class="timeline-item discard">
+        <h3>
+          <span class="iter-badge discard">DISCARD</span>
+          Iteration 3 — 실패
+        </h3>
+        <p style="font-size:0.85rem">
+          api_call() timeout 테스트 추가 → 15 passed (+0, 새 테스트 fail)<br>
+          delta=0, 코드 더 복잡 → <strong style="color:var(--red)">DISCARD</strong> → <code>git revert HEAD --no-edit</code><br>
+          consecutive_discards = 1
+        </p>
+      </div>
+
+      <!-- Iteration 4-5 -->
+      <div class="timeline-item discard">
+        <h3>
+          <span class="iter-badge discard">DISCARD ×2</span>
+          Iteration 4-5 — 연속 실패
+        </h3>
+        <p style="font-size:0.85rem">
+          #4: "add negative input test" → +0 → DISCARD<br>
+          #5: "add unicode test" → CRASH (SyntaxError) → DISCARD<br>
+          <strong style="color:var(--yellow)">consecutive_discards = 3 → REFINE 트리거!</strong>
+        </p>
+      </div>
+
+      <!-- Iteration 6: REFINE -->
+      <div class="timeline-item pivot">
+        <h3>
+          <span class="iter-badge pivot">REFINE</span>
+          Iteration 6 — 접근 방식 조정
+        </h3>
+        <div class="phases">
+          <div class="phase-box" style="grid-column: 1 / -1;">
+            <div class="label">Pivot Protocol Level 1</div>
+            최근 3개 discard 분석: timeout(mock 없음), negative(이미 처리), unicode(문법 오류)<br>
+            <strong>Root cause:</strong> 테스트 인프라(fixture/mock) 부족 → 인프라 보강으로 전환<br>
+            <code>conftest.py</code>에 mock_api_client fixture 추가 + 관련 테스트 3개
+          </div>
+        </div>
+        <p style="margin-top:10px;font-size:0.85rem">
+          → <strong style="color:var(--green)">18 passed (+3)</strong> → KEEP ✅ → 모든 카운터 리셋
+        </p>
+      </div>
+
+      <!-- Iteration 7-11 -->
+      <div class="timeline-item keep">
+        <h3>
+          <span class="iter-badge keep">KEEP ×4</span>
+          Iteration 7-11 — 성공/실패 반복
+        </h3>
+        <table class="tsv-table" style="margin-top:8px">
+          <tr><th>#</th><th>Strategy</th><th>Metric</th><th>Delta</th><th>Status</th></tr>
+          <tr><td>7</td><td>Exploit: fixture 활용 확대</td><td>20</td><td>+2</td><td class="status-keep">keep</td></tr>
+          <tr><td>8</td><td>Exploit: parametrize 적용</td><td>23</td><td>+3</td><td class="status-keep">keep</td></tr>
+          <tr><td>9</td><td>Explore: property-based test</td><td>23</td><td>+0</td><td class="status-discard">discard</td></tr>
+          <tr><td>10</td><td>Explore: error path test</td><td>25</td><td>+2</td><td class="status-keep">keep</td></tr>
+          <tr><td>11</td><td>Exploit: 추가 error path</td><td>26</td><td>+1</td><td class="status-keep">keep</td></tr>
+        </table>
+        <p style="margin-top:10px;font-size:0.82rem;color:var(--text-dim)">
+          [autoresearch] iteration 10/∞ | metric: 25 (+13) | keeps: 6 | discards: 3 | streak: 1 keep
+        </p>
+      </div>
+
+      <!-- Iteration 12-16: PIVOT -->
+      <div class="timeline-item pivot">
+        <h3>
+          <span class="iter-badge pivot">PIVOT</span>
+          Iteration 12-16 — 전략 완전 교체
+        </h3>
+        <p style="font-size:0.85rem">
+          #12-16: 5회 연속 discard (mock DB, integration, retry, concurrency, serialization)<br>
+          <strong style="color:var(--yellow)">consecutive_discards = 5 → PIVOT 트리거!</strong>
+        </p>
+        <div class="phase-box" style="margin-top:10px">
+          <div class="label">전략 전환</div>
+          <strong style="color:var(--red)">폐기:</strong> "개별 테스트 추가"<br>
+          <strong style="color:var(--green)">신규:</strong> "코드를 테스트 가능하게 리팩토링"<br>
+          Lesson 추출: "26개 이후 개별 추가는 수확 체감"
+        </div>
+      </div>
+
+      <!-- Iteration 17 -->
+      <div class="timeline-item keep">
+        <h3>
+          <span class="iter-badge keep">KEEP +3</span>
+          Iteration 17 — PIVOT 후 돌파
+        </h3>
+        <p style="font-size:0.85rem">
+          parse() 내부 거대 if-else → <code>_validate_header()</code> 함수 추출<br>
+          독립 테스트 3개 추가 → <strong style="color:var(--green)">29 passed (+3)</strong> → KEEP ✅
+        </p>
+      </div>
+
+      <!-- Session split -->
+      <div class="timeline-item session">
+        <h3>
+          <span class="iter-badge session">SESSION SPLIT</span>
+          Iteration 20 — 세션 분할
+        </h3>
+        <p style="font-size:0.85rem">
+          Context window 80% 도달 → state.json에 전체 상태 저장<br>
+          다음 세션에서 <code>/autoresearch</code> 호출 시 자동 Resume<br>
+          <strong>Final: 34 passed (baseline 12, +22)</strong>
+        </p>
+      </div>
+
+    </div><!-- timeline -->
+
+    <!-- Results TSV -->
+    <div class="card-full" style="margin-top:24px;overflow-x:auto">
+      <h3 style="font-size:0.9rem;margin-bottom:12px">autoresearch-results.tsv (발췌)</h3>
+      <table class="tsv-table">
+        <tr><th>iter</th><th>commit</th><th>metric</th><th>delta</th><th>guard</th><th>status</th><th>description</th></tr>
+        <tr><td>0</td><td>a1b2c3d</td><td>12</td><td>0</td><td>skip</td><td class="status-baseline">baseline</td><td>initial measurement (direction: higher)</td></tr>
+        <tr><td>1</td><td>e4f5g6h</td><td>13</td><td>+1</td><td>skip</td><td class="status-keep">keep</td><td>add empty string test for parse()</td></tr>
+        <tr><td>2</td><td>i7j8k9l</td><td>15</td><td>+2</td><td>skip</td><td class="status-keep">keep</td><td>add boundary value tests for validate()</td></tr>
+        <tr><td>3</td><td>m0n1o2p</td><td>15</td><td>0</td><td>skip</td><td class="status-discard">discard</td><td>add timeout test for api_call()</td></tr>
+        <tr><td>5</td><td>q3r4s5t</td><td>0</td><td>-15</td><td>skip</td><td class="status-crash">crash</td><td>add unicode handling test</td></tr>
+        <tr><td>6</td><td>u6v7w8x</td><td>18</td><td>+3</td><td>skip</td><td class="status-keep">keep</td><td>add mock_api_client fixture + tests [REFINE]</td></tr>
+        <tr><td>8</td><td>y9z0a1b</td><td>23</td><td>+3</td><td>skip</td><td class="status-keep">keep</td><td>apply parametrize to parser tests</td></tr>
+        <tr><td>16</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="status-pivot">[PIVOT]</td><td>abandon "add individual tests" → "refactor for testability"</td></tr>
+        <tr><td>17</td><td>c2d3e4f</td><td>29</td><td>+3</td><td>skip</td><td class="status-keep">keep</td><td>extract _validate_header() + 3 tests</td></tr>
+        <tr><td>20</td><td>g5h6i7j</td><td>34</td><td>+1</td><td>skip</td><td class="status-keep">keep</td><td>extract _normalize_tokens() + 2 tests</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===================== 2. FLOW ===================== -->
+  <div class="section" id="flow">
+    <div class="section-header">
+      <div class="icon" style="background:#1e3a5f;color:#93c5fd;">&#8635;</div>
+      <h2>핵심 루프 플로우</h2>
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-row">
+        <div class="flow-node neutral">사용자: /autoresearch</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node primary">Setup Gate</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node primary">Baseline 측정</div>
+      </div>
+      <div class="flow-arrow down">↓ 자율 루프 시작 (질문 ZERO)</div>
+      <div class="flow-row">
+        <div class="flow-node primary">① Review</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node primary">② Ideate</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node primary">③ Modify</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node primary">④ Commit</div>
+      </div>
+      <div class="flow-arrow down">↓</div>
+      <div class="flow-row">
+        <div class="flow-node primary">⑤ Verify</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node primary">⑤½ Guard</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node primary">⑥ Decide</div>
+      </div>
+      <div class="flow-arrow down">↓</div>
+      <div class="flow-row">
+        <div class="flow-node success">KEEP → current_best 갱신</div>
+        <span style="color:var(--text-dim);margin:0 12px">또는</span>
+        <div class="flow-node danger">DISCARD → git revert</div>
+      </div>
+      <div class="flow-arrow down">↓</div>
+      <div class="flow-row">
+        <div class="flow-node primary">⑦ Log (TSV + JSON)</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node primary">⑧ Repeat ♻️</div>
+      </div>
+      <div class="flow-arrow down">↓ 연속 실패 시</div>
+      <div class="flow-row">
+        <div class="flow-node warning">3회 → REFINE</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node warning">5회 → PIVOT</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node warning">2 PIVOTs → Web Search</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node danger">3 PIVOTs → Bold Mode</div>
+      </div>
+      <p style="margin-top:16px;font-size:0.82rem;color:var(--text-dim)">1회 KEEP → 모든 에스컬레이션 카운터 리셋</p>
+    </div>
+  </div>
+
+  <!-- ===================== 3. CONTRADICTIONS (FIXED) ===================== -->
+  <div class="section" id="contradictions">
+    <div class="section-header">
+      <div class="icon" style="background:var(--red-dim);color:var(--red);">&#9888;</div>
+      <h2>모순 및 오류</h2>
+      <span class="badge" style="background:var(--green-dim);color:var(--green);">8건 수정 완료</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3><span class="severity fixed">FIXED</span> safe_revert() 파괴적 동작</h3>
+        <p><strong>문제:</strong> <code>git checkout -- .</code>로 전체 working tree를 삭제. scope 밖 사용자 작업까지 날림.</p>
+        <p><strong>수정:</strong> <code>git checkout HEAD -- $SCOPE_FILES</code>로 scope 파일만 복원.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity fixed">FIXED</span> Phase 0 git add -A</h3>
+        <p><strong>문제:</strong> git init 시 <code>git add -A</code> 사용 — 자체 규칙("절대 git add -A 금지") 위반.</p>
+        <p><strong>수정:</strong> 구체적 파일만 staging + 경고 코멘트 추가.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity fixed">FIXED</span> Metric/Verify 이중 파라미터</h3>
+        <p><strong>문제:</strong> 둘 다 필수 파라미터인데 관계가 불명확. 루프에서는 verify_cmd만 사용.</p>
+        <p><strong>수정:</strong> Verify(필수) + metric_extraction(반필수, 기본값: 자동 추출)으로 재정의.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity fixed">FIXED</span> 상태 출력 주기 불일치</h3>
+        <p><strong>문제:</strong> SKILL.md는 "5회마다", results-logging.md는 "10회마다".</p>
+        <p><strong>수정:</strong> 5회=1줄 brief status, 10회=summary block으로 이원화.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity fixed">FIXED</span> PIVOT 트리거 기술 모호</h3>
+        <p><strong>문제:</strong> SKILL.md가 REFINE(3회) 단계를 누락하고 "5회→pivot"만 기술.</p>
+        <p><strong>수정:</strong> "3회→REFINE, 5회→PIVOT, 2 PIVOTs→Web Search, 3 PIVOTs→Bold" 전체 명시.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity fixed">FIXED</span> 메트릭 추출 전략 불일치</h3>
+        <p><strong>문제:</strong> "last number on last line" vs <code>grep | tail -1</code>(모든 라인의 마지막 매치) — 다른 결과 가능.</p>
+        <p><strong>수정:</strong> <code>grep -oE '[0-9]+\.?[0-9]*' | tail -1</code> (전체 출력의 마지막 숫자)로 통일.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity fixed">FIXED</span> baseline/current_best 용어 혼용</h3>
+        <p><strong>문제:</strong> "baseline"이 원래 시작값과 현재 최고값을 모두 의미하는 데 사용.</p>
+        <p><strong>수정:</strong> <code>baseline</code>=원래 시작값(불변), <code>current_best</code>=현재 최고값(keep마다 갱신).</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity fixed">FIXED</span> .gitignore 자동 설정 누락</h3>
+        <p><strong>문제:</strong> 결과/상태/레슨 파일을 gitignore한다고 명시하지만 실제 추가 로직 없음.</p>
+        <p><strong>수정:</strong> Phase 0에 .gitignore 자동 체크/추가 단계 신설.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 4. IMPROVEMENTS ===================== -->
+  <div class="section" id="improvements">
+    <div class="section-header">
+      <div class="icon" style="background:#1e3a5f;color:#93c5fd;">&#9889;</div>
+      <h2>추가 개선점</h2>
+      <span class="badge" style="background:var(--yellow-dim);color:var(--yellow);">미착수</span>
+    </div>
+
+    <table>
+      <tr><th>개선점</th><th>분류</th><th>설명</th></tr>
+      <tr>
+        <td><strong>Context window 관리</strong></td>
+        <td><span class="severity high">설계</span></td>
+        <td>장기 실행 시 proactive session split 로직 필요. 현재는 "context가 차면 알아서" 수준</td>
+      </tr>
+      <tr>
+        <td><strong>Parallel experiment 모드</strong></td>
+        <td><span class="severity high">설계</span></td>
+        <td>git worktree 활용 병렬 실험 지원. codex-autoresearch처럼 동시 3-5개 가설 테스트</td>
+      </tr>
+      <tr>
+        <td><strong>Timeout 설정 노출</strong></td>
+        <td><span class="severity medium">파라미터</span></td>
+        <td>verify timeout이 설정 파라미터로 미노출. ML 도메인에서 5분 기본값은 부족</td>
+      </tr>
+      <tr>
+        <td><strong>Graceful pause</strong></td>
+        <td><span class="severity medium">UX</span></td>
+        <td>Ctrl+C 외에 "다음 iteration 끝나면 멈춰" 같은 clean pause 메커니즘 부재</td>
+      </tr>
+      <tr>
+        <td><strong>Composite metric builder</strong></td>
+        <td><span class="severity medium">설계</span></td>
+        <td>core-principles.md에서 언급만 하고 실제 가이드 없음. Plan wizard에서 구성 지원 필요</td>
+      </tr>
+      <tr>
+        <td><strong>Rollback 검증</strong></td>
+        <td><span class="severity low">견고성</span></td>
+        <td>safe_revert() 후 메트릭이 이전 값으로 돌아갔는지 확인하는 단계 부재</td>
+      </tr>
+      <tr>
+        <td><strong>scripts/ 실체화</strong></td>
+        <td><span class="severity low">구조</span></td>
+        <td>log_iteration(), safe_revert(), write_state() 등을 실제 shell script로 제공</td>
+      </tr>
+      <tr>
+        <td><strong>Scope 외 파일 가이드</strong></td>
+        <td><span class="severity low">문서</span></td>
+        <td>scope 파일의 변경이 scope 밖 파일(import, type)에 의존할 때의 지침 부재</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ===================== 5. OUTCOMES ===================== -->
+  <div class="section" id="outcomes">
+    <div class="section-header">
+      <div class="icon" style="background:var(--green-dim);color:var(--green);">&#9733;</div>
+      <h2>기대 성과</h2>
+    </div>
+
+    <table>
+      <tr><th>영역</th><th>메트릭 예시</th><th>기대 효과</th><th>적합도</th></tr>
+      <tr>
+        <td><strong>테스트 커버리지 증대</strong></td>
+        <td>pass count, coverage %</td>
+        <td>50+ iteration으로 20-40% 향상. 반복적 테스트 추가에 최적화</td>
+        <td><span class="tag best">최적</span></td>
+      </tr>
+      <tr>
+        <td><strong>에러 수 감소 (/fix)</strong></td>
+        <td>error count</td>
+        <td>build/type/lint 에러를 0까지 체계적 소거. 가장 즉시적 ROI</td>
+        <td><span class="tag best">최적</span></td>
+      </tr>
+      <tr>
+        <td><strong>번들 사이즈 축소</strong></td>
+        <td>dist size (KB)</td>
+        <td>tree-shaking, code splitting, dead code 제거 자동화</td>
+        <td><span class="tag best">최적</span></td>
+      </tr>
+      <tr>
+        <td><strong>코드 복잡도 감소</strong></td>
+        <td>cyclomatic complexity</td>
+        <td>radon/eslint metrics 기반 자동 리팩토링</td>
+        <td><span class="tag best">최적</span></td>
+      </tr>
+      <tr>
+        <td><strong>성능 최적화</strong></td>
+        <td>latency (ms), throughput</td>
+        <td>좋은 벤치마크가 있으면 탐색적 최적화 가능</td>
+        <td><span class="tag best">최적</span></td>
+      </tr>
+      <tr>
+        <td><strong>보안 감사 (/security)</strong></td>
+        <td>composite score</td>
+        <td>패턴 매칭 기반 OWASP/STRIDE 점검. 동적 분석은 한계</td>
+        <td><span class="tag good">적합</span></td>
+      </tr>
+      <tr>
+        <td><strong>리팩토링</strong></td>
+        <td>complexity score</td>
+        <td>메트릭이 noisy. min_delta 튜닝 필요</td>
+        <td><span class="tag good">적합</span></td>
+      </tr>
+      <tr>
+        <td><strong>UI/UX 개선</strong></td>
+        <td>Lighthouse score (제한적)</td>
+        <td>기계적 메트릭 부재. proxy metric의 한계</td>
+        <td><span class="tag poor">부적합</span></td>
+      </tr>
+      <tr>
+        <td><strong>아키텍처 변경</strong></td>
+        <td>—</td>
+        <td>scope가 너무 넓고, 한 iteration에 원자적 변경 불가</td>
+        <td><span class="tag poor">부적합</span></td>
+      </tr>
+    </table>
+
+    <div class="card-full" style="margin-top:20px">
+      <h3 style="font-size:0.9rem;margin-bottom:8px">핵심 강점</h3>
+      <ul style="font-size:0.88rem;color:var(--text-dim);padding-left:20px">
+        <li><strong>Karpathy 패턴의 일반화</strong> — ML 도메인에서 검증된 패턴을 모든 도메인에 적용</li>
+        <li><strong>Cross-run learning</strong> — <code>autoresearch-lessons.md</code>를 통한 런 간 학습 축적</li>
+        <li><strong>4단계 PIVOT 프로토콜</strong> — stuck 상태에서 체계적 탈출 (REFINE → PIVOT → Search → Bold)</li>
+        <li><strong>6개 서브커맨드</strong> — 루프/plan/debug/fix/security/ship 완성도 높은 워크플로우</li>
+        <li><strong>Simplicity ratchet</strong> — 복잡도는 메트릭 향상 시에만 증가. 그 외엔 자동 필터링</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===================== 6. RISKS ===================== -->
+  <div class="section" id="risks">
+    <div class="section-header">
+      <div class="icon" style="background:var(--red-dim);color:var(--red);">&#9888;</div>
+      <h2>위험 요소</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3><span class="severity critical">CRITICAL</span> Goodhart's Law</h3>
+        <p>"측정이 목표가 되면 좋은 측정이 아니게 된다." 에이전트가 의미 없는 테스트 추가, 기능 삭제로 복잡도 감소 등 메트릭만 올리는 행동 가능.</p>
+        <div class="risk-meter"><div class="fill high" style="width:85%"></div></div>
+        <p style="margin-top:8px"><strong>대응:</strong> Guard 명령 필수 설정. 메트릭과 Guard의 이중 검증.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity critical">CRITICAL</span> Git 히스토리 오염</h3>
+        <p>experiment + revert 커밋이 대량 축적. 팀 프로젝트 main 브랜치에서 사용하면 히스토리 재앙.</p>
+        <div class="risk-meter"><div class="fill high" style="width:80%"></div></div>
+        <p style="margin-top:8px"><strong>대응:</strong> 반드시 실험 전용 브랜치에서 사용. 완료 후 squash merge.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity high">HIGH</span> Context window 고갈</h3>
+        <p>Unbounded 모드에서 20-30 iteration이면 context 한계 도달. Session resume 있으나 전환 시 추론 품질 저하.</p>
+        <div class="risk-meter"><div class="fill high" style="width:70%"></div></div>
+        <p style="margin-top:8px"><strong>대응:</strong> Bounded iterations(20-30)으로 시작. 결과 확인 후 연장.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity high">HIGH</span> 비용 폭주 (Unbounded)</h3>
+        <p>verify가 느리거나 비용이 드는 경우(GPU, cloud CI) 무한 루프는 리소스 낭비.</p>
+        <div class="risk-meter"><div class="fill high" style="width:65%"></div></div>
+        <p style="margin-top:8px"><strong>대응:</strong> Bounded 모드 권장. verify 30초 이내 목표.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity medium">MEDIUM</span> Scope 경계 교착</h3>
+        <p>scope 밖 파일 변경이 필요한데 규칙이 금지. 5+ discard → PIVOT → 또 discard 반복.</p>
+        <div class="risk-meter"><div class="fill medium" style="width:50%"></div></div>
+        <p style="margin-top:8px"><strong>대응:</strong> scope를 약간 넓게 설정. 또는 중간에 scope 조정.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity medium">MEDIUM</span> Pre-commit hook 충돌</h3>
+        <p>formatter/linter hook이 실험 코드를 거부 → hook-blocked 빈발 → 유효 iteration 감소.</p>
+        <div class="risk-meter"><div class="fill medium" style="width:45%"></div></div>
+        <p style="margin-top:8px"><strong>대응:</strong> hook이 자동 수정하는 유형이면 문제 없음. 차단형은 주의.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity medium">MEDIUM</span> 미묘한 버그 도입</h3>
+        <p>메트릭은 통과하지만 edge case에서 깨지는 코드. Guard가 방어하나 100%는 아님.</p>
+        <div class="risk-meter"><div class="fill medium" style="width:40%"></div></div>
+        <p style="margin-top:8px"><strong>대응:</strong> 실험 완료 후 코드 리뷰 필수. /autoresearch:ship으로 PR 생성.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="severity low">LOW</span> Noisy metric 오판</h3>
+        <p>타이밍 기반 메트릭 등에서 랜덤 변동으로 잘못된 keep/discard 결정.</p>
+        <div class="risk-meter"><div class="fill low" style="width:25%"></div></div>
+        <p style="margin-top:8px"><strong>대응:</strong> min_delta 설정, confirmation run, multi-run averaging.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 7. SCOPE ===================== -->
+  <div class="section" id="scope">
+    <div class="section-header">
+      <div class="icon" style="background:#1e3a5f;color:#93c5fd;">&#9881;</div>
+      <h2>코딩 활용 범위</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="card" style="border-left:3px solid var(--green)">
+        <h3 style="color:var(--green)">최적 시나리오</h3>
+        <ul>
+          <li><strong>테스트 자동 증식</strong> — <code>Scope: tests/</code> <code>Metric: pass count</code></li>
+          <li><strong>빌드 에러 일소</strong> — <code>/autoresearch:fix Target: build</code></li>
+          <li><strong>레거시 코드 리팩토링</strong> — <code>Metric: complexity score</code></li>
+          <li><strong>API 성능 튜닝</strong> — <code>Metric: p99 latency</code></li>
+          <li><strong>타입 에러 해소</strong> — <code>/autoresearch:fix Target: type</code></li>
+          <li><strong>보안 감사</strong> — <code>/autoresearch:security Depth: standard</code></li>
+        </ul>
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--yellow)">
+        <h3 style="color:var(--yellow)">적합 시나리오 (주의 필요)</h3>
+        <ul>
+          <li><strong>의존성 업데이트</strong> — 버전 올린 후 호환성 에러 자동 수정</li>
+          <li><strong>코드 마이그레이션</strong> — 레거시 API 호출 자동 교체</li>
+          <li><strong>Lint 규칙 일괄 적용</strong> — <code>/fix Target: lint</code></li>
+          <li><strong>문서 보강</strong> — readability score는 proxy. 한계 인지 필요</li>
+        </ul>
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--red)">
+        <h3 style="color:var(--red)">부적합 시나리오</h3>
+        <ul>
+          <li><strong>UI/UX 개선</strong> — 기계적 메트릭 부재</li>
+          <li><strong>아키텍처 변경</strong> — scope가 너무 넓음</li>
+          <li><strong>창의적 코딩</strong> — 주관적 품질을 숫자로 환원 불가</li>
+          <li><strong>분산 시스템 디버깅</strong> — 단일 머신 전제</li>
+          <li><strong>팀 main 브랜치</strong> — 히스토리 오염 위험</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card-full" style="margin-top:20px">
+      <h3 style="font-size:0.9rem;margin-bottom:12px">실전 체크리스트</h3>
+      <table>
+        <tr><th>#</th><th>항목</th><th>설명</th></tr>
+        <tr><td>1</td><td><strong>Bounded iterations부터</strong></td><td><code>Iterations: 20</code>으로 시작, 결과 보고 연장</td></tr>
+        <tr><td>2</td><td><strong>Guard 명령 필수</strong></td><td>메트릭 게이밍 방지의 핵심 방어선. <code>tsc --noEmit</code>, <code>pytest</code> 등</td></tr>
+        <tr><td>3</td><td><strong>실험 브랜치 분리</strong></td><td><code>git checkout -b autoresearch/test-coverage</code> 후 실행</td></tr>
+        <tr><td>4</td><td><strong>Fast metric 우선</strong></td><td>30초 이내 verify가 이상적. 느리면 proxy metric 탐색</td></tr>
+        <tr><td>5</td><td><strong>Ship으로 마무리</strong></td><td>완료 후 <code>/autoresearch:ship</code>으로 PR 생성, squash merge</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===================== 8. ARCHITECTURE ===================== -->
+  <div class="section" id="architecture">
+    <div class="section-header">
+      <div class="icon" style="background:#3b0764;color:var(--purple);">&#9744;</div>
+      <h2>아키텍처 구조</h2>
+    </div>
+
+    <div class="arch-grid">
+      <div class="arch-box">
+        <div class="title" style="color:var(--accent)">/autoresearch</div>
+        <div class="desc">메인 자율 루프<br>8-phase iteration</div>
+      </div>
+      <div class="arch-box">
+        <div class="title" style="color:var(--accent)">/autoresearch:plan</div>
+        <div class="desc">Goal→Config 마법사<br>7-step interactive wizard</div>
+      </div>
+      <div class="arch-box">
+        <div class="title" style="color:var(--accent)">/autoresearch:debug</div>
+        <div class="desc">과학적 디버깅<br>hypothesis → test → fix</div>
+      </div>
+      <div class="arch-box">
+        <div class="title" style="color:var(--accent)">/autoresearch:fix</div>
+        <div class="desc">반복적 에러 수정<br>error count → 0</div>
+      </div>
+      <div class="arch-box">
+        <div class="title" style="color:var(--accent)">/autoresearch:security</div>
+        <div class="desc">보안 감사<br>STRIDE + OWASP Top 10</div>
+      </div>
+      <div class="arch-box">
+        <div class="title" style="color:var(--accent)">/autoresearch:ship</div>
+        <div class="desc">배포 워크플로우<br>PR / Release / Deploy</div>
+      </div>
+    </div>
+
+    <div class="card-full" style="margin-top:16px">
+      <h3 style="font-size:0.9rem;margin-bottom:12px">파일 구조</h3>
+      <table style="font-family:'JetBrains Mono','Fira Code',monospace;font-size:0.8rem">
+        <tr><th>경로</th><th>역할</th></tr>
+        <tr><td>.claude-plugin/plugin.json</td><td>플러그인 매니페스트</td></tr>
+        <tr><td>commands/autoresearch.md</td><td>메인 커맨드 (thin dispatcher)</td></tr>
+        <tr><td>commands/autoresearch/*.md</td><td>서브커맨드 5개</td></tr>
+        <tr><td>skills/autoresearch/SKILL.md</td><td>핵심 스킬 정의 (setup gate, rules, loop pseudocode)</td></tr>
+        <tr><td>references/autonomous-loop-protocol.md</td><td>8-phase 루프 상세 프로토콜</td></tr>
+        <tr><td>references/core-principles.md</td><td>7가지 핵심 원칙</td></tr>
+        <tr><td>references/pivot-protocol.md</td><td>4단계 stuck recovery</td></tr>
+        <tr><td>references/session-resume.md</td><td>세션 간 상태 복원</td></tr>
+        <tr><td>references/lessons-protocol.md</td><td>런 간 학습 축적</td></tr>
+        <tr><td>references/results-logging.md</td><td>TSV 로깅 포맷 명세</td></tr>
+        <tr><td>references/{debug,fix,security,ship}-workflow.md</td><td>서브커맨드별 워크플로우</td></tr>
+      </table>
+    </div>
+
+    <div class="card-full">
+      <h3 style="font-size:0.9rem;margin-bottom:12px">상태 파일 (gitignored)</h3>
+      <div class="arch-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="arch-box">
+          <div class="title" style="color:var(--cyan)">autoresearch-results.tsv</div>
+          <div class="desc">Append-only 결과 로그<br>iteration별 metric/status 기록</div>
+        </div>
+        <div class="arch-box">
+          <div class="title" style="color:var(--cyan)">autoresearch-state.json</div>
+          <div class="desc">Atomic snapshot<br>config + 현재 상태<br>세션 복원의 핵심</div>
+        </div>
+        <div class="arch-box">
+          <div class="title" style="color:var(--cyan)">autoresearch-lessons.md</div>
+          <div class="desc">런 간 학습 기록<br>최대 50개, time decay<br>다음 런에서 자동 참조</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 9. METRIC ENHANCEMENT ===================== -->
+  <div class="section" id="metric-enhancement">
+    <div class="section-header">
+      <div class="icon" style="background:var(--green-dim);color:var(--green);">&#9670;</div>
+      <h2>메트릭 향상</h2>
+      <span class="badge" style="background:var(--green-dim);color:var(--green);">NEW — 구현 완료</span>
+    </div>
+
+    <!-- 3 Level Cards -->
+    <div class="card-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="card" style="border-top:3px solid var(--green)">
+        <h3 style="color:var(--green)">Level 1: Direct</h3>
+        <p>목표 자체가 숫자. 별도 설계 불필요.</p>
+        <ul>
+          <li>테스트 통과 수</li>
+          <li>에러 카운트</li>
+          <li>번들 사이즈 (bytes)</li>
+          <li>실행 시간 (ms)</li>
+        </ul>
+        <p style="margin-top:8px;font-size:0.8rem;color:var(--green)">상관도: 1:1 (완벽)</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--yellow)">
+        <h3 style="color:var(--yellow)">Level 2: Proxy</h3>
+        <p>주관적 목표의 기계적 대리 지표.</p>
+        <ul>
+          <li>"가독성" → cognitive complexity</li>
+          <li>"테스트 품질" → mutation score</li>
+          <li>"API 안정성" → fault injection 통과율</li>
+          <li>"성능" → hyperfine median p99</li>
+        </ul>
+        <p style="margin-top:8px;font-size:0.8rem;color:var(--yellow)">상관도: 높음 (proxy 선택에 의존)</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--purple)">
+        <h3 style="color:var(--purple)">Level 3: Composite</h3>
+        <p>복합 목표를 가중 합산. 스크립트로 생성.</p>
+        <ul>
+          <li><code>metric-test-quality.sh</code><br>= 0.6×pass_rate + 0.4×coverage</li>
+          <li><code>metric-code-health.sh</code><br>= 100 - 3×errors - 1×lint + 0.3×tests</li>
+          <li><code>metric-perf-score.sh</code><br>= latency_score × weight</li>
+        </ul>
+        <p style="margin-top:8px;font-size:0.8rem;color:var(--purple)">상관도: 조정 가능 (가중치 튜닝)</p>
+      </div>
+    </div>
+
+    <!-- Anti-Gaming -->
+    <div class="card-full" style="margin-top:20px">
+      <h3 style="font-size:0.95rem;margin-bottom:16px">Anti-Gaming 3계층 방어</h3>
+      <table>
+        <tr><th>계층</th><th>메커니즘</th><th>방어 대상</th><th>상태</th></tr>
+        <tr>
+          <td><strong>Layer 1</strong></td>
+          <td>Guard 명령</td>
+          <td>"메트릭은 올랐는데 다른 게 깨졌다" (regression)</td>
+          <td><span class="severity fixed">기존</span></td>
+        </tr>
+        <tr>
+          <td><strong>Layer 2</strong></td>
+          <td>Metric Sanity Check</td>
+          <td>비정상 점프 감지 (3× 평균 delta 초과 시 재검증)</td>
+          <td><span class="severity" style="background:var(--green-dim);color:var(--green);">NEW</span></td>
+        </tr>
+        <tr>
+          <td><strong>Layer 3</strong></td>
+          <td>Structural Guard</td>
+          <td>테스트 삭제, 기능 삭제로 메트릭 올리기 차단</td>
+          <td><span class="severity" style="background:var(--green-dim);color:var(--green);">NEW</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Metric Validation -->
+    <div class="card-full">
+      <h3 style="font-size:0.95rem;margin-bottom:12px">Setup 시 메트릭 검증 프로토콜</h3>
+      <div class="flow-diagram" style="padding:20px;text-align:left;font-size:0.85rem">
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 16px;align-items:center">
+          <span style="color:var(--accent);font-weight:600">1.</span> <span>Verify 명령 3회 실행 → 분산 측정</span>
+          <span style="color:var(--accent);font-weight:600">2.</span> <span>분산 &lt; 5%: OK | 5-20%: min_delta 권장 | &gt;20%: 메트릭 재설계 권고</span>
+          <span style="color:var(--accent);font-weight:600">3.</span> <span>숫자 추출 가능 여부 확인 → 실패 시 metric_extraction 조정 요청</span>
+          <span style="color:var(--accent);font-weight:600">4.</span> <span>실행 시간 측정 → &gt;5분이면 faster proxy 권고</span>
+          <span style="color:var(--accent);font-weight:600">5.</span> <span>Direction 자동 감지 + 사용자 지정값과 교차 검증</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 10. SCOPE ENHANCEMENT ===================== -->
+  <div class="section" id="scope-enhancement">
+    <div class="section-header">
+      <div class="icon" style="background:#3b0764;color:var(--purple);">&#9638;</div>
+      <h2>3-Tier Scope 모델</h2>
+      <span class="badge" style="background:var(--green-dim);color:var(--green);">NEW — 구현 완료</span>
+    </div>
+
+    <!-- 3-Tier Visual -->
+    <div class="flow-diagram" style="text-align:left">
+      <div style="max-width:600px;margin:0 auto">
+        <div style="background:var(--green-dim);border:2px solid var(--green);border-radius:10px;padding:16px;margin-bottom:12px">
+          <div style="font-weight:700;color:var(--green);margin-bottom:4px">Tier 1: Core Scope — 전체 읽기/쓰기</div>
+          <div style="font-size:0.85rem;color:var(--text-dim)">에이전트가 자유롭게 수정하는 주 대상 파일. 모든 실험이 여기서 발생.</div>
+          <div style="margin-top:6px"><code style="color:var(--green)">tests/*.py</code></div>
+        </div>
+        <div style="background:var(--yellow-dim);border:2px solid var(--yellow);border-radius:10px;padding:16px;margin-bottom:12px">
+          <div style="font-weight:700;color:var(--yellow);margin-bottom:4px">Tier 2: Support Scope — 제한적 쓰기</div>
+          <div style="font-size:0.85rem;color:var(--text-dim)">Core 변경을 지원하기 위한 최소 수정만 허용. export 추가, 타입 조정, import 수정 정도.</div>
+          <div style="margin-top:6px"><code style="color:var(--yellow)">src/parser.py, src/utils.py</code></div>
+        </div>
+        <div style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-weight:700;color:var(--text-dim);margin-bottom:4px">Tier 3: Context Scope — 읽기 전용</div>
+          <div style="font-size:0.85rem;color:var(--text-dim)">이해를 위해 읽을 수 있지만 절대 수정 불가. Review/Ideate 페이즈에서 참조.</div>
+          <div style="margin-top:6px"><code style="color:var(--text-dim)">src/**/*.py, config/*, docs/*</code></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="card-grid" style="margin-top:20px">
+      <div class="card">
+        <h3>자동 감지</h3>
+        <p>Setup 시 Core scope 파일의 import를 분석하여 Support scope를 자동 제안합니다.</p>
+        <ul>
+          <li><code>test_parser.py</code> → imports <code>src/parser.py</code></li>
+          <li><code>test_utils.py</code> → imports <code>src/utils.py</code></li>
+        </ul>
+        <p style="margin-top:8px">"이 파일들을 Support scope에 추가할까요?"</p>
+      </div>
+
+      <div class="card">
+        <h3>PIVOT 시 Scope 확장</h3>
+        <p>연속 실패의 원인이 scope 경계인지 자동 분석합니다.</p>
+        <ul>
+          <li>PIVOT 트리거 시 discard 원인 분석</li>
+          <li>"scope 밖 파일 수정 필요" 패턴 감지</li>
+          <li>Support scope 자동 확장 제안</li>
+        </ul>
+        <p style="margin-top:8px;color:var(--yellow)">교착 상태의 주요 원인 해소</p>
+      </div>
+
+      <div class="card">
+        <h3>Support 규칙</h3>
+        <p>Support 파일에 허용되는 변경:</p>
+        <ul>
+          <li style="color:var(--green)">✓ export/import 추가</li>
+          <li style="color:var(--green)">✓ 타입 시그니처 조정</li>
+          <li style="color:var(--green)">✓ 함수 visibility 변경</li>
+          <li style="color:var(--red)">✗ 비즈니스 로직 변경</li>
+          <li style="color:var(--red)">✗ 코드 구조 변경</li>
+          <li style="color:var(--red)">✗ 기능 추가/삭제</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Before/After -->
+    <div class="card-full" style="margin-top:20px">
+      <h3 style="font-size:0.95rem;margin-bottom:16px">Before vs After</h3>
+      <table>
+        <tr><th>상황</th><th>기존 (단일 Scope)</th><th>개선 (3-Tier)</th></tr>
+        <tr>
+          <td>테스트에서 private 함수 테스트 필요</td>
+          <td style="color:var(--red)">scope 밖 → 수정 불가 → DISCARD 반복</td>
+          <td style="color:var(--green)">Support에서 export 추가 → Core에서 테스트 작성</td>
+        </tr>
+        <tr>
+          <td>타입 에러로 새 테스트 컴파일 실패</td>
+          <td style="color:var(--red)">타입 파일이 scope 밖 → CRASH</td>
+          <td style="color:var(--green)">Support에서 타입 조정 → 정상 컴파일</td>
+        </tr>
+        <tr>
+          <td>5회 연속 DISCARD (scope 경계 문제)</td>
+          <td style="color:var(--red)">PIVOT → 또 같은 벽 → 교착</td>
+          <td style="color:var(--green)">PIVOT 시 scope 확장 제안 → 벽 해소</td>
+        </tr>
+        <tr>
+          <td>다른 모듈 이해 필요</td>
+          <td style="color:var(--red)">scope 밖 파일 읽기 불명확</td>
+          <td style="color:var(--green)">Context scope에서 안전하게 읽기 전용 참조</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div><!-- container -->
+
+<!-- Footer -->
+<div style="border-top:1px solid var(--border);padding:24px;text-align:center;font-size:0.78rem;color:var(--text-dim)">
+  Generated by Claude Code analysis &middot; autoresearch v1.0.0 &middot; 2026-03-21
+</div>
+
+</body>
+</html>

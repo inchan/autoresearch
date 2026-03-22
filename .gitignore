@@ -1,0 +1,6 @@
+autoresearch-results.tsv
+autoresearch-state.json
+autoresearch-lessons.md
+*.tmp
+*.bak
+*.prev
