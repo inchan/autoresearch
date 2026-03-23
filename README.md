@@ -12,6 +12,39 @@ The LLM agent is the mutation function, replacing random search with reasoning-d
 claude plugin add autoresearch
 ```
 
+Or use the installer helper (interactive / non-interactive):
+
+```bash
+# Interactive mode (skills.sh-style menu flow)
+./scripts/install-autoresearch.sh
+
+# Non-interactive mode (CI-friendly)
+./scripts/install-autoresearch.sh --action install --source . --yes --non-interactive
+```
+
+Full installation scenarios (Korean, all cases):  
+`docs/INSTALL_GUIDE_KO.md`
+
+## Installation UX Direction (skills.sh style)
+
+The project remains focused on the **Claude plugin** runtime.
+
+Planned installation direction:
+
+1. **skills.sh-style installer/TUI**
+   - Provide a clean interactive install flow inspired by skills.sh.
+   - Focus on plugin install/update/remove and command wiring for Claude.
+2. **Simple non-interactive mode**
+   - Keep script flags for CI or advanced users who prefer direct commands.
+3. **Single-runtime clarity**
+   - Prioritize reliability and maintainability for Claude instead of expanding to additional runtimes.
+
+### Validation
+
+Installer validation checklist and phased plan:
+
+- `docs/INSTALLER_VALIDATION_PLAN.md`
+
 ## Commands
 
 | Command | Description |
