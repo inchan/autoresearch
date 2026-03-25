@@ -19,7 +19,7 @@
 - 배포 형태: **Claude Code 플러그인** + 슬래시 커맨드 + 스킬 레퍼런스 문서 구조
 - 주요 실행 방식:
   - `/autoresearch` 메인 루프 실행
-  - `/autoresearch:plan`, `:debug`, `:fix`, `:security`, `:ship`로 목적별 워크플로우 분기
+  - `/autoresearch plan|debug|fix|security|ship`로 목적별 워크플로우 분기
 - 상태/기록 관리:
   - 실험 로그: `autoresearch-results.tsv` (append-only)
   - 세션 상태: `autoresearch-state.json` (재개 가능)
