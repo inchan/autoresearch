@@ -47,14 +47,16 @@ Installer validation checklist and phased plan:
 
 ## Commands
 
+Single command with mode argument:
+
 | Command | Description |
 |---------|-------------|
 | `/autoresearch` | Main autonomous optimization loop |
-| `/autoresearch:plan` | Interactive goal-to-config wizard |
-| `/autoresearch:debug` | Scientific debugging loop |
-| `/autoresearch:fix` | Iterative error repair |
-| `/autoresearch:security` | STRIDE + OWASP security audit |
-| `/autoresearch:ship` | Universal shipping workflow |
+| `/autoresearch plan` | Interactive goal-to-config wizard |
+| `/autoresearch debug` | Scientific debugging loop |
+| `/autoresearch fix` | Iterative error repair |
+| `/autoresearch security` | STRIDE + OWASP security audit |
+| `/autoresearch ship` | Universal shipping workflow |
 
 ## Quick Start
 
@@ -65,7 +67,7 @@ Installer validation checklist and phased plan:
 Or use the interactive wizard:
 
 ```
-/autoresearch:plan
+/autoresearch plan
 ```
 
 ## Parameters
