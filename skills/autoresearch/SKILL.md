@@ -12,22 +12,23 @@ Autonomous goal-directed iteration for any domain with a measurable metric.
 
 ---
 
-## Subcommand Routing
+## Mode Routing
 
-| Command | Skill file | Description |
+The first argument determines the operating mode. If no mode is given, default to the main autonomous loop.
+
+| Mode | References to load | Description |
 |---|---|---|
-| `/autoresearch` | `SKILL.md` + `references/autonomous-loop-protocol.md` + `references/results-logging.md` | Main autonomous loop |
-| `/autoresearch:plan` | `references/plan-workflow.md` | Interactive goal -> config wizard |
-| `/autoresearch:debug` | `references/debug-workflow.md` | Scientific debugging loop |
-| `/autoresearch:fix` | `references/fix-workflow.md` | Iterative error repair |
-| `/autoresearch:security` | `references/security-workflow.md` | STRIDE + OWASP security audit |
-| `/autoresearch:ship` | `references/ship-workflow.md` | Universal shipping workflow |
+| *(none)* | `references/autonomous-loop-protocol.md` + `references/results-logging.md` + `references/core-principles.md` | Main autonomous loop |
+| `plan` | `references/plan-workflow.md` | Interactive goal -> config wizard |
+| `debug` | `references/debug-workflow.md` + `references/results-logging.md` | Scientific debugging loop |
+| `fix` | `references/fix-workflow.md` + `references/results-logging.md` | Iterative error repair |
+| `security` | `references/security-workflow.md` + `references/results-logging.md` | STRIDE + OWASP security audit |
+| `ship` | `references/ship-workflow.md` + `references/results-logging.md` | Universal shipping workflow |
 
-Supporting protocols (loaded on-demand by the loop):
+Supporting protocols (loaded on-demand):
 
 | Reference | When loaded |
 |---|---|
-| `references/core-principles.md` | At run start, for grounding |
 | `references/metric-design.md` | During setup (metric selection) and when metric issues arise |
 | `references/pivot-protocol.md` | When consecutive discards accumulate |
 | `references/session-resume.md` | When resuming a previous run |
