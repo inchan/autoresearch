@@ -1,6 +1,6 @@
 # Plan Workflow
 
-Interactive 7-step wizard that guides the user from a vague goal to a fully specified autoresearch configuration. This is the `/autoresearch:plan` command.
+Interactive 7-step wizard that guides the user from a vague goal to a fully specified autoresearch configuration. This is the `/autoresearch plan` command.
 
 ---
 

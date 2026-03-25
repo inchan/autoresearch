@@ -1,6 +1,6 @@
 # Fix Workflow
 
-Iterative error repair protocol for the `/autoresearch:fix` command. Systematically fixes all errors from tests, types, lint, and build in priority order.
+Iterative error repair protocol for the `/autoresearch fix` command. Systematically fixes all errors from tests, types, lint, and build in priority order.
 
 ---
 
@@ -302,7 +302,7 @@ Min delta: 1 (must fix at least one error per iteration)
 
 ```
 The fix workflow can be invoked:
-1. Directly: /autoresearch:fix target: pytest scope: src/
+1. Directly: /autoresearch fix target: pytest scope: src/
 2. From the main loop: when a "crash" reveals multiple errors
 3. From the debug workflow: when the root cause requires fixing related issues
 

@@ -1,6 +1,6 @@
 # Ship Workflow
 
-Universal shipping protocol for the `/autoresearch:ship` command. Handles code PRs, releases, deployments, and content publishing through a unified 8-phase workflow.
+Universal shipping protocol for the `/autoresearch ship` command. Handles code PRs, releases, deployments, and content publishing through a unified 8-phase workflow.
 
 ---
 
@@ -175,7 +175,7 @@ Run all applicable checks automatically.
 If any check fails:
   --force flag: skip and continue (with warning)
   No --force: stop and report the failure
-  Suggest: /autoresearch:fix to resolve issues
+  Suggest: /autoresearch fix to resolve issues
 ```
 
 ---
@@ -495,7 +495,7 @@ If error tracking is available:
 The ship workflow is the natural endpoint of an autoresearch run:
 
 1. /autoresearch optimizes the code (many iterations)
-2. /autoresearch:ship packages and delivers the result
+2. /autoresearch ship packages and delivers the result
 
 The ship workflow reads the autoresearch results to:
 - Generate PR descriptions from experiment summaries

@@ -1,6 +1,6 @@
 # Debug Workflow
 
-Scientific debugging loop for the `/autoresearch:debug` command. Applies the autoresearch iteration pattern to bug hunting: form hypotheses, test them one at a time, converge on the root cause.
+Scientific debugging loop for the `/autoresearch debug` command. Applies the autoresearch iteration pattern to bug hunting: form hypotheses, test them one at a time, converge on the root cause.
 
 ---
 
@@ -320,7 +320,7 @@ Debug sessions should be timeboxed:
 
 - After 5 fix attempts without a clean fix:
   Print a summary of the constraints
-  The fix may require a larger refactor — suggest /autoresearch:fix
+  The fix may require a larger refactor — suggest /autoresearch fix
 ```
 
 ---
@@ -330,7 +330,7 @@ Debug sessions should be timeboxed:
 ```
 When /autoresearch encounters a "crash" status:
   If 3+ consecutive crashes on similar changes:
-  Suggest: "Consider running /autoresearch:debug to investigate the crash pattern"
+  Suggest: "Consider running /autoresearch debug to investigate the crash pattern"
 
 The debug workflow can feed back into the main loop:
   1. Debug identifies a structural issue

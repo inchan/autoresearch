@@ -1,6 +1,6 @@
 # Security Workflow
 
-STRIDE + OWASP security audit protocol for the `/autoresearch:security` command. Applies the autoresearch iteration pattern to security testing: identify threats, test them systematically, build a comprehensive report.
+STRIDE + OWASP security audit protocol for the `/autoresearch security` command. Applies the autoresearch iteration pattern to security testing: identify threats, test them systematically, build a comprehensive report.
 
 ---
 
