@@ -31,18 +31,12 @@ This is a Claude Code plugin with slash commands and skills.
   plugin.json                 # Plugin manifest (name, version, metadata)
 .claude/
   settings.json               # Project-level Claude Code settings
-commands/                     # Slash command entry points (plugin root)
-  autoresearch.md             # /autoresearch — main loop
-  autoresearch/
-    plan.md                   # /autoresearch:plan — goal->config wizard
-    debug.md                  # /autoresearch:debug — scientific bug hunting
-    fix.md                    # /autoresearch:fix — iterative error repair
-    security.md               # /autoresearch:security — STRIDE+OWASP audit
-    ship.md                   # /autoresearch:ship — release workflow
+commands/                     # Slash command entry point
+  autoresearch.md             # /autoresearch [mode] — unified entry point with mode routing
 skills/                       # Skills (plugin root)
   autoresearch/
-    SKILL.md                  # Main skill definition (loaded by all commands)
-    references/               # Protocol documents (loaded on-demand)
+    SKILL.md                  # Main skill definition + mode routing table
+    references/               # Protocol documents (loaded on-demand by mode)
       autonomous-loop-protocol.md   # Full 8-phase loop protocol
       core-principles.md            # 7 universal principles
       results-logging.md            # TSV format and logging functions
@@ -63,7 +57,7 @@ scripts/                      # Composite metric script templates
 
 ### Key Design Decisions
 
-- **Commands are thin dispatchers** — they parse arguments, then delegate to SKILL.md + references
+- **Single command, mode routing** — one command file dispatches to the correct references via SKILL.md mode routing table
 - **References are loaded on-demand** — keeps context window lean; only load what the current mode needs
 - **State is file-based** — `autoresearch-results.tsv` (append-only log) + `autoresearch-state.json` (atomic snapshot). Both gitignored, never committed
 - **Git is the primary memory** — agent reads `git log` and `git diff` every iteration to learn from past experiments. `git revert` preferred over `git reset --hard` to preserve history
