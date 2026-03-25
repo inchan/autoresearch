@@ -438,7 +438,7 @@ Adapt metric suggestions, verify commands, and guard commands accordingly during
 
 ### On Error
 - Crashes: log, revert, continue
-- Unrecoverable: stop loop, print diagnostic, suggest `/autoresearch:debug`
+- Unrecoverable: stop loop, print diagnostic, suggest `/autoresearch debug`
 
 ---
 
