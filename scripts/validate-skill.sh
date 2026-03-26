@@ -62,7 +62,7 @@ c=$(safe_count "metric-design" "$SKILL_DIR/SKILL.md")
 [ "$c" -gt 0 ] || errors=$((errors + 1))
 
 # 12. Check scripts directory has metric templates
-c=$(ls scripts/metric-*.sh 2>/dev/null | wc -l | tr -d '[:space:]')
+c=$(ls "$SKILL_DIR"/scripts/metric-*.sh 2>/dev/null | wc -l | tr -d '[:space:]')
 [ "$c" -gt 0 ] || errors=$((errors + 1))
 
 # 13. Check plugin.json is valid JSON

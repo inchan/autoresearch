@@ -34,9 +34,9 @@
   - 3단계 스코프 모델(Core/Support/Context)
   - 정체 구간 대응(REFINE/PIVOT)
 - 보조 스크립트:
-  - `scripts/metric-test-quality.sh` (테스트 + 커버리지 복합 지표)
-  - `scripts/metric-code-health.sh` (타입/린트/테스트 기반 코드 건강 지표)
-  - `scripts/metric-perf-score.sh` (지연시간 기반 성능 지표)
+  - `skills/autoresearch/scripts/metric-test-quality.sh` (테스트 + 커버리지 복합 지표)
+  - `skills/autoresearch/scripts/metric-code-health.sh` (타입/린트/테스트 기반 코드 건강 지표)
+  - `skills/autoresearch/scripts/metric-perf-score.sh` (지연시간 기반 성능 지표)
 
 ## 6) 전체 요약 (One-page Summary)
 - **Autoresearch는 “LLM을 실험 변이 함수로 활용하는 자동 최적화 프레임워크”**입니다.

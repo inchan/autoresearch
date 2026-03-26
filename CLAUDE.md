@@ -49,10 +49,10 @@ skills/                       # Skills (plugin root)
       session-resume.md            # Cross-session state recovery
       lessons-protocol.md          # Cross-run learning persistence
       metric-design.md             # Metric design guide, composite templates, anti-gaming
-scripts/                      # Composite metric script templates
-  metric-test-quality.sh        # Test quality composite (pass rate + coverage)
-  metric-code-health.sh         # Code health composite (errors + lint + tests + complexity)
-  metric-perf-score.sh          # Performance composite (latency + memory)
+    scripts/                      # Composite metric script templates
+      metric-test-quality.sh        # Test quality composite (pass rate + coverage)
+      metric-code-health.sh         # Code health composite (errors + lint + tests + complexity)
+      metric-perf-score.sh          # Performance composite (latency + memory)
 ```
 
 ### Key Design Decisions
