@@ -584,21 +584,28 @@ At the start of Phase 2 (Ideate):
 ### During the Loop
 - NEVER ask the user questions
 - NEVER request confirmation
-- NEVER suggest stopping
+- NEVER suggest stopping or pausing
+- NEVER say "I'll stop here" or "Let me know if you want me to continue"
 - Make all decisions autonomously based on the metric
+- Keep output minimal — every token of output consumes context window budget
 
-### Status Updates
+### Status Updates (Context-Efficient)
 ```
-Every 5 iterations, print a brief 1-line status:
-[autoresearch] iteration 15/∞ | metric: 87.3 (+12.1) | keeps: 8 | discards: 6 | streak: 2 keeps
+Keep status output compact to conserve context window budget.
 
-Every 10 iterations, print a detailed summary block (see results-logging.md).
+Every 5 iterations, print ONE line only:
+[autoresearch] iter 15/∞ | metric: 87.3 (+12.1) | K:8 D:6 | streak: 2K
 
-On PIVOT events:
-[autoresearch] PIVOT at iteration 12: switching strategy to "<new strategy>"
+Every 10 iterations, print a 3-line summary (not a full report):
+[autoresearch] === 10-iter summary ===
+[autoresearch] best: 87.3 (baseline: 75.0, +12.3) | K:8 D:6 C:1
+[autoresearch] top strategy: "add boundary tests" (+5.2)
 
-On guard failures:
-[autoresearch] guard failure at iteration 9, attempting rework (1/2)
+On PIVOT events (1 line):
+[autoresearch] PIVOT@12: "add edge case tests" → "refactor test helpers"
+
+On guard failures (1 line):
+[autoresearch] guard fail@9, rework 1/2
 ```
 
 ### Completion (Bounded Mode)
