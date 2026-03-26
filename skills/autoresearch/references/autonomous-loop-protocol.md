@@ -200,7 +200,7 @@ When a change spans multiple files:
 ALWAYS read the current file contents before modifying.
 NEVER assume contents from memory.
 Files may have changed from previous iterations.
-Use the Read tool, not memory.
+Always read from disk, not from memory.
 ```
 
 ---
