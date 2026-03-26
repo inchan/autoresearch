@@ -224,21 +224,17 @@ No previous run detected.
 
 ---
 
-## Session Splitting (Context Overflow Handling)
+## Session Splitting
 
-Sessions WILL be split during long runs. This is expected behavior, not an error. The state file makes splits seamless.
+For very long runs, sessions may need to be split intentionally.
 
 ### When to Split
 
 ```
 Split a session when:
-- Context window is getting full (~80% capacity) — this is the PRIMARY trigger
-- Context compaction has occurred (agent detects summarized/truncated history)
-- The agent's response quality is degrading (repetitive, less precise)
+- Context window is getting full (~80% capacity)
+- The agent's response quality is degrading
 - A natural breakpoint occurs (after a PIVOT, after a summary)
-
-Context overflow is the #1 cause of agents stopping mid-loop.
-The session split protocol prevents this by saving state BEFORE overflow.
 ```
 
 ### How to Split
