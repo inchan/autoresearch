@@ -73,11 +73,15 @@ If state file exists:
 
 Read the current state of the world. This phase is PURE OBSERVATION — no modifications.
 
-### Read Scope Files
+### Read Scope Files (Context-Efficient)
 ```
-For each file matching the Core scope glob:
-  Read the file contents
-  Note: current line count, structure, key functions/sections
+For iteration 1 or after a PIVOT:
+  Read ALL Core scope files fully (cold start needs full context)
+
+For iterations 2+:
+  Read only files that changed in the last iteration (use git diff HEAD~1 --name-only)
+  Skip unchanged files — their contents are already known from prior reads
+  This saves context window budget for long-running sessions
 
 If Support scope is defined:
   Skim support files for interface/export changes since last iteration
@@ -467,6 +471,19 @@ if iteration >= max_iterations:
 else:
     increment iteration
     return to Phase 1
+```
+
+### Context Checkpoint (Before Phase 1)
+```
+Before starting the next iteration, check context budget:
+If context window is ~80% full (agent-specific detection):
+  1. Save state to autoresearch-state.json (emergency checkpoint)
+  2. Print: "[autoresearch] Context checkpoint at iteration N. State saved. Resume with: /autoresearch"
+  3. Graceful exit — do NOT continue with degraded context
+  4. The next session auto-resumes via state file
+
+This prevents mid-iteration corruption from context overflow.
+The state file is the contract between sessions — always keep it current.
 ```
 
 ### When Stuck (>5 Consecutive Discards)
