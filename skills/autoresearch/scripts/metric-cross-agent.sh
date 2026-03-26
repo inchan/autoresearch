@@ -59,4 +59,26 @@ fi
 # 13. Explicit iteration batching / chunking guidance (1 pt)
 grep -qi "batch\|chunk\|split.*session\|break.*session\|context.*budget" "$SKILL" && score=$((score + 1))
 
+# 14. Tool-agnostic language in LOOP — no platform-specific tool names (1 pt)
+c=$(grep -ci "Read tool\|Edit tool\|Write tool\|Bash tool\|Glob tool" "$LOOP" | head -1 | tr -d '[:space:]')
+[ "$c" -eq 0 ] && score=$((score + 1))
+
+# 15. Session resume mentions context overflow in session-resume.md (1 pt)
+grep -qi "context.*overflow\|context.*window\|context.*full\|compaction" "$RESUME" && score=$((score + 1))
+
+# 16. SKILL.md word count efficiency — under 4000 words (1 pt)
+wc=$(wc -w < "$SKILL" | tr -d '[:space:]')
+[ "$wc" -lt 4000 ] && score=$((score + 1))
+
+# 17. LOOP word count efficiency — under 4000 words (1 pt)
+wc=$(wc -w < "$LOOP" | tr -d '[:space:]')
+[ "$wc" -lt 4000 ] && score=$((score + 1))
+
+# 18. Compact iteration status format defined (1 pt)
+grep -qi "\[autoresearch\].*iteration\|status.*format\|1-line.*status\|one-line.*status" "$SKILL" && score=$((score + 1))
+
+# 19. No tool-specific assumptions in SKILL.md (1 pt)
+c=$(grep -ci "Read tool\|Edit tool\|Write tool\|Bash tool\|Glob tool" "$SKILL" | head -1 | tr -d '[:space:]')
+[ "$c" -eq 0 ] && score=$((score + 1))
+
 echo "$score"
