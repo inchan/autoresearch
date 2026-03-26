@@ -365,6 +365,32 @@ These rules are non-negotiable. Violating any of them breaks the loop's correctn
 - NEVER repeat the exact same change that was already discarded.
 - NEVER give up. Pivot to a fundamentally different strategy.
 
+### 9. Persist State Every Iteration
+- Write `autoresearch-state.json` after EVERY iteration (Phase 7).
+- If context window is filling up, the session can resume from the state file.
+- State file is the checkpoint — treat it as the primary recovery mechanism.
+
+### 10. Context Window Management
+- The agent's context window is a finite resource. Manage it actively.
+- In Phase 1 (Review): read only files that changed since last iteration. Skip unchanged files.
+- Keep status output compact: 1-line summaries, not verbose explanations.
+- If context budget is running low (~80% full), trigger a session split: save state, print handoff message, stop cleanly.
+- On session split, the next invocation auto-resumes via `autoresearch-state.json`.
+
+---
+
+## Cross-Agent Compatibility
+
+This skill is agent-agnostic and platform-agnostic. It works with any LLM agent that can read files, write files, and run shell commands (Codex CLI, Gemini CLI, or any agent supporting the `.agents/skills/` convention).
+
+**No agent-specific constructs** in SKILL.md or references — all instructions use generic tool descriptions (read, write, run command).
+
+**Context window awareness:** Different agents have different context limits. The skill is designed for context efficiency:
+- References are loaded on-demand, not all at once
+- Review phase reads diffs, not full files, when possible
+- Status output is kept to 1-line per iteration
+- Session resume via state file handles context overflow gracefully
+
 ---
 
 ## Bounded Iterations
