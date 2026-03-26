@@ -81,4 +81,24 @@ grep -qi "\[autoresearch\].*iteration\|status.*format\|1-line.*status\|one-line.
 c=$(grep -ci "Read tool\|Edit tool\|Write tool\|Bash tool\|Glob tool" "$SKILL" | head -1 | tr -d '[:space:]')
 [ "$c" -eq 0 ] && score=$((score + 1))
 
+# 20. All reference files exist (1 pt)
+refs_ok=1
+while IFS= read -r ref; do
+  [ -f "skills/autoresearch/$ref" ] || refs_ok=0
+done < <(grep -oE 'references/[a-z-]+\.md' "$SKILL" 2>/dev/null | sort -u)
+[ "$refs_ok" -eq 1 ] && score=$((score + 1))
+
+# 21. No hardcoded paths in SKILL.md body — uses relative refs only (1 pt)
+c=$(grep -ci "/home/\|/Users/\|C:\\\\\|/tmp/" "$SKILL" | head -1 | tr -d '[:space:]')
+[ "$c" -eq 0 ] && score=$((score + 1))
+
+# 22. SKILL.md has clear stop condition enumeration (1 pt)
+grep -qi "valid stop condition\|stop condition.*:\|only.*stop.*when" "$SKILL" && score=$((score + 1))
+
+# 23. Autonomous loop pseudocode is self-contained — no external deps (1 pt)
+grep -qi "should_continue\|while.*iteration\|loop.*pseudocode\|loop.*until" "$SKILL" && score=$((score + 1))
+
+# 24. Communication protocol has both setup and loop sections (1 pt)
+grep -qi "During Setup\|During Loop\|setup.*interactive\|loop.*autonomous" "$SKILL" && score=$((score + 1))
+
 echo "$score"
