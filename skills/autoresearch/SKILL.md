@@ -324,9 +324,11 @@ Never use `git checkout -- .` — it destroys unrelated working tree changes.
 These rules are non-negotiable. Violating any of them breaks the loop's correctness guarantees.
 
 ### 1. Loop Until Done
-- Unbounded mode: NEVER stop. NEVER ask "should I continue?" Run until interrupted.
+- Unbounded mode: NEVER stop. NEVER ask "should I continue?" NEVER pause. NEVER halt. Run until interrupted.
 - Bounded mode: Run exactly N iterations, then stop and summarize.
-- The only valid stop conditions: iteration limit reached, user interrupt, unrecoverable crash.
+- The only valid stop conditions: iteration limit reached, user interrupt, context window full (trigger session split), unrecoverable crash.
+- Do not stop because "enough progress was made" — the user decides when to stop, not the agent.
+- If context window fills up, save state and exit cleanly — the next session resumes automatically.
 
 ### 2. Read Before Write
 - ALWAYS read a file's current contents before modifying it.
