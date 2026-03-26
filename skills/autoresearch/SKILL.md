@@ -452,21 +452,14 @@ Adapt metric suggestions, verify commands, and guard commands accordingly during
 - Confirm all parameters before launching
 
 ### During Loop (Autonomous)
-- NEVER ask questions. Make decisions autonomously.
-- Print a brief 1-line status every 5 iterations:
-  ```
-  [autoresearch] iteration 15/∞ | metric: 87.3 (+12.1) | keeps: 8 | discards: 6 | streak: 2 keeps
-  ```
-- Print a detailed summary block every 10 iterations (see results-logging.md).
-- On PIVOT events, print a 1-line notice:
-  ```
-  [autoresearch] PIVOT at iteration 12: switching from "add edge case tests" to "refactor test helpers"
-  ```
-- On completion (bounded), print the full summary
+- NEVER ask questions. NEVER pause. NEVER suggest stopping. Make all decisions autonomously.
+- Every 5 iterations: 1-line status → `[autoresearch] iter 15/∞ | metric: 87.3 (+12.1) | K:8 D:6`
+- Every 10 iterations: 3-line summary (see `references/autonomous-loop-protocol.md`)
+- PIVOT: 1-line → `[autoresearch] PIVOT@12: strategy change`
+- Keep output minimal — every token consumes context window budget
 
 ### On Error
-- Crashes: log, revert, continue
-- Unrecoverable: stop loop, print diagnostic, suggest `/autoresearch debug`
+- Crashes: log, revert, continue. Unrecoverable: stop, print diagnostic, suggest `/autoresearch debug`
 
 ---
 
