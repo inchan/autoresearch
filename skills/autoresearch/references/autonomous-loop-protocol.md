@@ -440,13 +440,15 @@ iteration   commit_hash   metric   delta   guard   status   description
 
 ### State File Update
 ```
-Update autoresearch-state.json:
+Write state after every iteration — this is the checkpoint that enables session resume.
+Update autoresearch-state.json atomically (write to .tmp, then rename):
 - state.iteration = current iteration number
 - state.metric = current metric value
 - state.consecutive_discards = current streak
 - state.pivot_count = current pivot count
 - state.last_status = status from this iteration
 - state.updated_at = ISO timestamp
+Persist every iteration without exception — even on crash or discard.
 ```
 
 ---
