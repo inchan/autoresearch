@@ -19,7 +19,7 @@ elif command -v mypy &>/dev/null; then
 fi
 
 # --- Lint warnings (penalty: -1 each) ---
-if command -v eslint &>/dev/null && ls .eslintrc* eslint.config.* &>/dev/null; then
+if command -v eslint &>/dev/null && [ -f .eslintrc* ] 2>/dev/null; then
   lint_issues=$(eslint src/ --format compact 2>&1 | grep -cE "(Warning|Error)" || echo 0)
   score=$(echo "scale=1; $score - 1 * $lint_issues" | bc)
 elif command -v ruff &>/dev/null; then
@@ -29,10 +29,10 @@ fi
 
 # --- Test passes (bonus: +0.3 each) ---
 if command -v pytest &>/dev/null; then
-  test_pass=$(pytest --tb=no -q 2>&1 | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' | head -1 || echo 0)
+  test_pass=$(pytest --tb=no -q 2>&1 | grep -oP '\d+(?= passed)' | head -1 || echo 0)
   score=$(echo "scale=1; $score + 0.3 * $test_pass" | bc)
 elif [ -f package.json ] && grep -q '"test"' package.json 2>/dev/null; then
-  test_pass=$(npx jest --silent 2>&1 | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' | head -1 || echo 0)
+  test_pass=$(npx jest --silent 2>&1 | grep -oP '\d+(?= passed)' | head -1 || echo 0)
   score=$(echo "scale=1; $score + 0.3 * $test_pass" | bc)
 fi
 
