@@ -135,10 +135,7 @@ Actions:
    - Consider changes that affect the test/build infrastructure
    - Try combined multi-part changes (relax the one-change rule slightly)
    - If Support scope exists, allow broader changes to Support files
-
-3. Continue the loop — do NOT stop
-   - The human can interrupt if the warning indicates a fundamental issue
-   - But the agent keeps trying
+   - Continue the loop — do NOT stop. The human can interrupt if needed.
 
 4. Log: "[SOFT BLOCKER] entering bold exploration mode"
 ```
