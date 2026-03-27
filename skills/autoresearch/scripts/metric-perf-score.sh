@@ -15,20 +15,25 @@ WEIGHT_LATENCY=1.0        # adjust if adding memory dimension
 RUNS=3                    # number of runs for median
 # ------------------------------------------------
 
+# Portable millisecond timer (works on macOS and Linux)
+now_ms() {
+  python3 -c 'import time; print(int(time.time() * 1000))'
+}
+
 # Run benchmark multiple times, collect timings
-declare -a timings
+timings=""
 for i in $(seq 1 $RUNS); do
-  start_ns=$(date +%s%N)
+  start_ms=$(now_ms)
   eval "$BENCH_CMD" >/dev/null 2>&1 || true
-  end_ns=$(date +%s%N)
-  elapsed_ms=$(( (end_ns - start_ns) / 1000000 ))
-  timings+=("$elapsed_ms")
+  end_ms=$(now_ms)
+  elapsed_ms=$(( end_ms - start_ms ))
+  timings="${timings}${elapsed_ms}\n"
 done
 
 # Sort and take median
-IFS=$'\n' sorted=($(sort -n <<<"${timings[*]}")); unset IFS
-median_idx=$(( RUNS / 2 ))
-latency_ms=${sorted[$median_idx]}
+sorted=$(echo -e "$timings" | grep -v '^$' | sort -n)
+median_idx=$(( RUNS / 2 + 1 ))
+latency_ms=$(echo "$sorted" | sed -n "${median_idx}p")
 
 # Convert to score: 100 at target, 0 at 4x target, linear
 if [ "$latency_ms" -le "$LATENCY_TARGET_MS" ]; then

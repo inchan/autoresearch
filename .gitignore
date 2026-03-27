@@ -1,6 +1,8 @@
 autoresearch-results.tsv
 autoresearch-state.json
+autoresearch-state.json.tmp
 autoresearch-lessons.md
 *.tmp
 *.bak
 *.prev
+.DS_Store

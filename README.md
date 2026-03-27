@@ -25,25 +25,22 @@ Or use the installer helper (interactive / non-interactive):
 Full installation scenarios (Korean, all cases):  
 `docs/INSTALL_GUIDE_KO.md`
 
-## Installation UX Direction (skills.sh style)
+## Cross-Agent Compatibility
 
-The project remains focused on the **Claude plugin** runtime.
+This skill is agent-agnostic. It works with any LLM agent that can read files, write files, and run shell commands.
 
-Planned installation direction:
+| Agent | Tested | Result |
+|-------|--------|--------|
+| Claude Code | Yes | 5/5 iterations, all keeps |
+| Codex CLI | Yes | 5/5 iterations, all keeps |
+| Gemini CLI | Yes | 5/5 iterations, all keeps |
 
-1. **skills.sh-style installer/TUI**
-   - Provide a clean interactive install flow inspired by skills.sh.
-   - Focus on plugin install/update/remove and command wiring for Claude.
-2. **Simple non-interactive mode**
-   - Keep script flags for CI or advanced users who prefer direct commands.
-3. **Single-runtime clarity**
-   - Prioritize reliability and maintainability for Claude instead of expanding to additional runtimes.
+Install the skill for other agents:
 
-### Validation
-
-Installer validation checklist and phased plan:
-
-- `docs/INSTALLER_VALIDATION_PLAN.md`
+```bash
+# Codex CLI / Gemini CLI
+cp -r skills/autoresearch /path/to/project/.agents/skills/autoresearch
+```
 
 ## Commands
 

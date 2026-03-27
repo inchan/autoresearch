@@ -16,8 +16,8 @@ WEIGHT_COV=0.4
 
 # Measure pass rate
 test_output=$($TEST_CMD 2>&1) || true
-passed=$(echo "$test_output" | grep -oP '\d+(?= passed)' | head -1 || echo 0)
-failed=$(echo "$test_output" | grep -oP '\d+(?= failed)' | head -1 || echo 0)
+passed=$(echo "$test_output" | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' | head -1 || echo 0)
+failed=$(echo "$test_output" | grep -oE '[0-9]+ failed' | grep -oE '[0-9]+' | head -1 || echo 0)
 total=$((passed + failed))
 
 if [ "$total" -eq 0 ]; then
