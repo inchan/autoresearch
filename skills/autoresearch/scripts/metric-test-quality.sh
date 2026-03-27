@@ -7,6 +7,11 @@
 
 set -euo pipefail
 
+# --- Dependency check ---
+for cmd in pytest bc; do
+  command -v "$cmd" &>/dev/null || { echo "ERROR: $cmd not found" >&2; echo 0; exit 1; }
+done
+
 # --- Configuration (adjust for your project) ---
 TEST_CMD="pytest --tb=no -q"
 COV_CMD="pytest --cov=src --cov-report=term-missing --tb=no -q"
