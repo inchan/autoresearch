@@ -7,6 +7,11 @@
 
 set -euo pipefail
 
+# --- Dependency check ---
+for cmd in python3 bc; do
+  command -v "$cmd" &>/dev/null || { echo "ERROR: $cmd not found" >&2; echo 0; exit 1; }
+done
+
 BENCH_CMD="${1:?Usage: metric-perf-score.sh <benchmark-command>}"
 
 # --- Configuration (adjust for your project) ---
@@ -32,8 +37,11 @@ done
 
 # Sort and take median
 sorted=$(echo -e "$timings" | grep -v '^$' | sort -n)
-median_idx=$(( RUNS / 2 + 1 ))
+line_count=$(echo "$sorted" | wc -l | tr -d '[:space:]')
+median_idx=$(( (line_count + 1) / 2 ))
+[ "$median_idx" -lt 1 ] && median_idx=1
 latency_ms=$(echo "$sorted" | sed -n "${median_idx}p")
+[ -z "$latency_ms" ] && { echo "ERROR: no timing data collected" >&2; echo 0; exit 1; }
 
 # Convert to score: 100 at target, 0 at 4x target, linear
 if [ "$latency_ms" -le "$LATENCY_TARGET_MS" ]; then
