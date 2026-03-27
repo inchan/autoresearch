@@ -541,44 +541,6 @@ For reproducible metrics:
 
 ---
 
-## Git as Memory
-
-### Configuration
-```
-The agent uses git as its primary memory system:
-- git log: what was tried, what worked
-- git diff: what changed in each experiment
-- git revert: undo failed experiments while preserving history
-- Commit messages: structured experiment descriptions
-```
-
-### Reading History for Context
-```bash
-# What has been tried recently?
-git log --oneline -20
-
-# What did a specific experiment change?
-git diff <commit>^..<commit>
-
-# What's the full history of a specific file?
-git log --oneline -- <file>
-
-# What experiments were reverted?
-git log --oneline --grep="Revert"
-```
-
-### Integration Example
-```
-At the start of Phase 2 (Ideate):
-1. Read git log -20 to see recent experiments
-2. Parse commit messages for experiment descriptions
-3. Identify: tried strategies, successful strategies, failed strategies
-4. Use this to avoid repeating failed experiments
-5. Use this to extend successful experiments
-```
-
----
-
 ## Communication Rules
 
 ### During the Loop
