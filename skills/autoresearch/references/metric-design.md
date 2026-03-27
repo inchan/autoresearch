@@ -333,11 +333,16 @@ Decision tree:
 
 Is the goal directly measurable as a single number?
 ├── Yes → Level 1 (Direct). Use it.
-└── No → Can you find ONE proxy that correlates well?
-    ├── Yes → Level 2 (Proxy). Validate correlation.
-    └── No → Can you combine 2-3 sub-metrics?
-        ├── Yes → Level 3 (Composite). Write a metric script.
-        └── No → Break into sub-goals that ARE measurable.
+└── No
+    ├── Can you find ONE proxy that correlates well?
+    │   ├── Yes → Level 2 (Proxy). Validate correlation.
+    │   └── No
+    │       ├── Can you combine 2-3 sub-metrics?
+    │       │   ├── Yes → Level 3 (Composite). Write a metric script.
+    │       │   └── No → This goal may not be suitable for autoresearch.
+    │       │           Consider breaking it into sub-goals that ARE measurable.
+    │       └──
+    └──
 
 Validation: after choosing, ask yourself:
   "If the agent maximizes this metric by ANY means,
