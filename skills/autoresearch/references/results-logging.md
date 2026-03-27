@@ -204,24 +204,6 @@ Was the change committed successfully?
 
 ## Summary Reporting
 
-### Every 10 Iterations
-
-Print a summary block every 10 iterations:
-
-```
-======================================================
-  autoresearch summary — iterations 1-10
-======================================================
-  Baseline metric:  75.0
-  Current metric:   84.5  (+9.5, higher is better)
-  Keeps:            4
-  Discards:         5
-  Crashes:          1
-  Best single delta: +5.0 (iteration 3)
-  Current streak:   2 keeps
-======================================================
-```
-
 ### Final Summary (Bounded Mode)
 
 Print at the end of a bounded run:
