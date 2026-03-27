@@ -502,45 +502,6 @@ The state file is the contract between sessions — always keep it current.
 
 ---
 
-## Noise Handling
-
-Some metrics are inherently noisy (timing, ML training). Use these strategies:
-
-### Multi-Run Averaging
-```
-If metric variance is high:
-  Run verify_cmd 3 times
-  Use the median value
-  Only apply for timing-based metrics
-```
-
-### Minimum Delta (min_delta)
-```
-Require a minimum improvement threshold.
-Changes below this threshold are treated as noise.
-Default: 0 (any improvement counts)
-Recommended for noisy metrics: set to 2x observed variance
-```
-
-### Confirmation Run
-```
-After a "keep" decision on a noisy metric:
-  Re-run verification once more
-  If second run contradicts: change to "discard"
-  Only use for metrics with known high variance
-```
-
-### Environment Pinning
-```
-For reproducible metrics:
-  Pin random seeds where possible
-  Disable parallel execution in test runners
-  Use consistent hardware (same machine, same load)
-  Note environment in state file
-```
-
----
-
 ## Communication Rules
 
 ### During the Loop
