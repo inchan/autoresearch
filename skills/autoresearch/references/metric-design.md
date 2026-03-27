@@ -79,56 +79,15 @@ Normalization:
 
 ## Composite Metric Templates
 
-### Test Quality Score
+Ready-to-use scripts are in `scripts/`:
 
-```bash
-#!/bin/bash
-# Measures how good the tests are, not just how many pass
-pass_rate=$(pytest --tb=no -q 2>&1 | grep -oP '\d+(?= passed)' || echo 0)
-total=$(pytest --tb=no -q 2>&1 | grep -oP '\d+(?= (passed|failed))' | head -1 || echo 1)
-pass_pct=$(echo "scale=1; $pass_rate * 100 / $total" | bc 2>/dev/null || echo 0)
+| Script | Measures | Direction |
+|---|---|---|
+| `scripts/metric-test-quality.sh` | Pass rate + coverage (0-100) | higher |
+| `scripts/metric-code-health.sh` | Type errors + lint + tests (100 base, penalties/bonuses) | higher |
+| `scripts/metric-perf-score.sh` | Latency benchmark (0-100) | higher |
 
-coverage=$(pytest --cov=src --cov-report=term 2>&1 | grep 'TOTAL' | grep -oE '[0-9]+%' | grep -oE '[0-9]+' || echo 0)
-
-# Combine: 60% pass rate + 40% coverage
-echo "scale=1; 0.6 * $pass_pct + 0.4 * $coverage" | bc
-```
-
-### Code Health Score
-
-```bash
-#!/bin/bash
-# Composite: type errors, lint warnings, complexity, test coverage
-type_errors=$(tsc --noEmit 2>&1 | grep -c "error TS" || echo 0)
-lint_warnings=$(eslint src/ --format compact 2>&1 | grep -c "Warning" || echo 0)
-test_pass=$(npx jest --silent 2>&1 | grep -oP '\d+(?= passed)' || echo 0)
-complexity=$(npx ts-complexity src/ 2>&1 | tail -1 | grep -oE '[0-9.]+' || echo 10)
-
-# Score: start at 100, subtract penalties, add bonuses
-echo "scale=1; 100 - 3*$type_errors - 1*$lint_warnings - 0.5*$complexity + 0.2*$test_pass" | bc
-```
-
-### Performance Score
-
-```bash
-#!/bin/bash
-# Composite: latency + throughput + memory
-latency_ms=$(hyperfine --warmup 3 './bench' --export-json /dev/stdout 2>/dev/null \
-  | jq '.results[0].mean * 1000' 2>/dev/null || echo 999)
-memory_mb=$(./bench --measure-memory 2>&1 | grep -oE '[0-9.]+' | tail -1 || echo 999)
-
-# Lower is better for both, so invert into a score
-# Assumes latency target ~50ms, memory target ~100MB
-latency_score=$(echo "scale=1; 100 - ($latency_ms / 50 * 50)" | bc 2>/dev/null || echo 0)
-memory_score=$(echo "scale=1; 100 - ($memory_mb / 100 * 50)" | bc 2>/dev/null || echo 0)
-
-# 70% latency, 30% memory
-echo "scale=1; 0.7 * $latency_score + 0.3 * $memory_score" | bc
-```
-
-### Security Score
-
-Already defined in security-workflow.md:
+Security scoring is defined in `references/security-workflow.md`:
 ```
 score = (owasp_tested / 10) * 50 + (stride_tested / 6) * 30 + min(findings, 20)
 ```
