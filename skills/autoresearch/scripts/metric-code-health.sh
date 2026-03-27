@@ -7,6 +7,9 @@
 
 set -euo pipefail
 
+# --- Required dependency ---
+command -v bc &>/dev/null || { echo "ERROR: bc not found" >&2; echo 0; exit 1; }
+
 score=100
 
 # --- Type errors (penalty: -3 each) ---
