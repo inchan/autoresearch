@@ -21,8 +21,10 @@ WEIGHT_COV=0.4
 
 # Measure pass rate
 test_output=$($TEST_CMD 2>&1) || true
-passed=$(echo "$test_output" | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' | head -1 || echo 0)
-failed=$(echo "$test_output" | grep -oE '[0-9]+ failed' | grep -oE '[0-9]+' | head -1 || echo 0)
+passed=$(echo "$test_output" | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' | head -1 || true)
+passed=${passed:-0}
+failed=$(echo "$test_output" | grep -oE '[0-9]+ failed' | grep -oE '[0-9]+' | head -1 || true)
+failed=${failed:-0}
 total=$((passed + failed))
 
 if [ "$total" -eq 0 ]; then
@@ -33,7 +35,8 @@ fi
 
 # Measure coverage
 cov_output=$($COV_CMD 2>&1) || true
-coverage=$(echo "$cov_output" | grep 'TOTAL' | grep -oE '[0-9]+%' | grep -oE '[0-9]+' || echo 0)
+coverage=$(echo "$cov_output" | grep 'TOTAL' | grep -oE '[0-9]+%' | grep -oE '[0-9]+' || true)
+coverage=${coverage:-0}
 
 # Composite score
 score=$(echo "scale=1; $WEIGHT_PASS * $pass_pct + $WEIGHT_COV * $coverage" | bc)
