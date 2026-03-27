@@ -84,8 +84,8 @@ Normalization:
 ```bash
 #!/bin/bash
 # Measures how good the tests are, not just how many pass
-pass_rate=$(pytest --tb=no -q 2>&1 | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' || echo 0)
-total=$(pytest --tb=no -q 2>&1 | grep -oE '[0-9]+ (passed|failed)' | grep -oE '[0-9]+' | head -1 || echo 1)
+pass_rate=$(pytest --tb=no -q 2>&1 | grep -oP '\d+(?= passed)' || echo 0)
+total=$(pytest --tb=no -q 2>&1 | grep -oP '\d+(?= (passed|failed))' | head -1 || echo 1)
 pass_pct=$(echo "scale=1; $pass_rate * 100 / $total" | bc 2>/dev/null || echo 0)
 
 coverage=$(pytest --cov=src --cov-report=term 2>&1 | grep 'TOTAL' | grep -oE '[0-9]+%' | grep -oE '[0-9]+' || echo 0)
@@ -101,7 +101,7 @@ echo "scale=1; 0.6 * $pass_pct + 0.4 * $coverage" | bc
 # Composite: type errors, lint warnings, complexity, test coverage
 type_errors=$(tsc --noEmit 2>&1 | grep -c "error TS" || echo 0)
 lint_warnings=$(eslint src/ --format compact 2>&1 | grep -c "Warning" || echo 0)
-test_pass=$(npx jest --silent 2>&1 | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' || echo 0)
+test_pass=$(npx jest --silent 2>&1 | grep -oP '\d+(?= passed)' || echo 0)
 complexity=$(npx ts-complexity src/ 2>&1 | tail -1 | grep -oE '[0-9.]+' || echo 10)
 
 # Score: start at 100, subtract penalties, add bonuses
