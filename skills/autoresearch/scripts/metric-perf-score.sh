@@ -29,7 +29,7 @@ now_ms() {
 timings=""
 for i in $(seq 1 $RUNS); do
   start_ms=$(now_ms)
-  eval "$BENCH_CMD" >/dev/null 2>&1 || true
+  bash -c "$BENCH_CMD" >/dev/null 2>&1 || true
   end_ms=$(now_ms)
   elapsed_ms=$(( end_ms - start_ms ))
   timings="${timings}${elapsed_ms}\n"
