@@ -6,66 +6,13 @@ Full 8-phase loop specification for the autoresearch autonomous iteration engine
 
 ## Phase 0: Precondition Checks
 
-Execute BEFORE entering the loop. All checks must pass.
+Execute BEFORE entering the loop. All must pass.
 
-### Git State
-```
-Verify:
-1. Current directory is inside a git repository (git rev-parse --git-dir)
-2. Git is functional (git status returns 0)
-3. The default branch exists and has at least one commit
-```
-
-If not a git repo, initialize one:
-```bash
-git init
-# Stage specific files — never use `git add -A` (may include secrets or unrelated files)
-# Stage scope files + known config files explicitly
-git add <scope files> <project config files>
-git commit -m "initial commit"
-```
-
-### Dirty Tree
-```
-Check: git status --porcelain
-If dirty:
-  1. Ask user (during setup only) whether to commit or stash
-  2. If committing: git add <relevant files> && git commit -m "experiment(<scope>): pre-autoresearch snapshot"
-  3. If stashing: git stash push -m "autoresearch-pre-run"
-  4. Record the decision in state file
-```
-
-### Hooks
-```
-Check: ls .git/hooks/pre-commit* .husky/pre-commit* 2>/dev/null
-If hooks exist:
-  1. Note their presence in state
-  2. NEVER use --no-verify
-  3. If hooks fail during the loop, fix the underlying issue
-```
-
-### Gitignore
-```
-Ensure autoresearch working files are gitignored.
-Check .gitignore for these entries; append any that are missing:
-
-  autoresearch-results.tsv
-  autoresearch-state.json
-  autoresearch-state.json.tmp
-  autoresearch-lessons.md
-
-These are working files — never committed to the repository.
-If .gitignore does not exist, create it with these entries.
-```
-
-### Session Resume
-```
-Check: test -f autoresearch-state.json
-If state file exists:
-  1. Load references/session-resume.md
-  2. Follow recovery priority matrix
-  3. May skip setup and jump directly into loop
-```
+1. **Git state** — verify git repo exists (`git rev-parse --git-dir`). If not, `git init` and commit scope files (never `git add -A`)
+2. **Dirty tree** — if `git status --porcelain` is non-empty, ask user to commit or stash (setup only)
+3. **Hooks** — detect pre-commit hooks. NEVER use `--no-verify`; fix underlying issues
+4. **Gitignore** — ensure these are in `.gitignore`: `autoresearch-results.tsv`, `autoresearch-state.json`, `autoresearch-state.json.tmp`, `autoresearch-lessons.md`
+5. **Session resume** — if `autoresearch-state.json` exists, load `references/session-resume.md` and follow recovery matrix
 
 ---
 
@@ -74,47 +21,19 @@ If state file exists:
 Read the current state of the world. This phase is PURE OBSERVATION — no modifications.
 
 ### Read Scope Files (Context-Efficient)
-```
-For iteration 1 or after a PIVOT:
-  Read ALL Core scope files fully (cold start needs full context)
-
-For iterations 2+:
-  Read only files that changed in the last iteration (use git diff HEAD~1 --name-only)
-  Skip unchanged files — their contents are already known from prior reads
-  This saves context window budget for long-running sessions
-
-If Support scope is defined:
-  Skim support files for interface/export changes since last iteration
-  Note: available functions, type signatures, exports
-
-If Context scope is defined:
-  Only re-read context files when the current hypothesis requires understanding
-  a specific dependency or pattern outside Core+Support
-```
+- **Iteration 1 or post-PIVOT**: read ALL Core scope files fully
+- **Iteration 2+**: read only changed files (`git diff HEAD~1 --name-only`), skip unchanged
+- **Support scope**: skim for interface/export changes only
+- **Context scope**: re-read only when hypothesis requires it
 
 ### Read Results Log
-```
-If autoresearch-results.tsv exists:
-  Read the last 10-20 entries
-  Identify: current best metric, recent trend, recent strategies
-  Count: total keeps, total discards, consecutive discards
-```
+Read last 10-20 entries from `autoresearch-results.tsv`. Identify: current best, recent trend, consecutive discards.
 
 ### Read Git History
-```
-git log --oneline -20
-For recent experiment commits:
-  Note what was tried, what worked, what didn't
-  Identify patterns in successful changes
-```
+`git log --oneline -20` — note what worked, what didn't, patterns in successful changes.
 
 ### Read Lessons
-```
-If autoresearch-lessons.md exists:
-  Read lessons relevant to current goal and scope
-  Prioritize recent lessons over old ones
-  Note anti-patterns to avoid
-```
+If `autoresearch-lessons.md` exists, read lessons relevant to current goal. Prioritize recent over old.
 
 ---
 
@@ -504,39 +423,16 @@ The state file is the contract between sessions — always keep it current.
 
 ## Communication Rules
 
-### During the Loop
-- NEVER ask the user questions
-- NEVER request confirmation
-- NEVER suggest stopping or pausing
-- NEVER say "I'll stop here" or "Let me know if you want me to continue"
-- Make all decisions autonomously based on the metric
-- Keep output minimal — every token of output consumes context window budget
+- NEVER ask questions, request confirmation, or suggest stopping during the loop
+- Keep output minimal — every token consumes context window budget
 
-### Status Updates (Context-Efficient)
+### Status Formats
 ```
-Keep status output compact to conserve context window budget.
-
-Every 5 iterations, print ONE line only:
-[autoresearch] iter 15/∞ | metric: 87.3 (+12.1) | K:8 D:6 | streak: 2K
-
-Every 10 iterations, print a 3-line summary (not a full report):
-[autoresearch] === 10-iter summary ===
-[autoresearch] best: 87.3 (baseline: 75.0, +12.3) | K:8 D:6 C:1
-[autoresearch] top strategy: "add boundary tests" (+5.2)
-
-On PIVOT events (1 line):
-[autoresearch] PIVOT@12: "add edge case tests" → "refactor test helpers"
-
-On guard failures (1 line):
-[autoresearch] guard fail@9, rework 1/2
+Every 5 iterations (1 line):   [autoresearch] iter 15/∞ | metric: 87.3 (+12.1) | K:8 D:6 | streak: 2K
+Every 10 iterations (3 lines): [autoresearch] === 10-iter summary === best/baseline/top strategy
+On PIVOT (1 line):              [autoresearch] PIVOT@12: "old strategy" → "new strategy"
+On guard fail (1 line):         [autoresearch] guard fail@9, rework 1/2
 ```
 
-### Completion (Bounded Mode)
-```
-Print full summary:
-- Iteration count and breakdown (keeps/discards/crashes)
-- Starting and ending metric with net change
-- Top 3 most impactful changes
-- Lessons extracted
-- Suggested next steps
-```
+### Completion (Bounded)
+Print: iteration breakdown (K/D/C), start→end metric with delta, top 3 changes, lessons, next steps.
