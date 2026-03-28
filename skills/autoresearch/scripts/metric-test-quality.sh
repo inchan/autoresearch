@@ -13,14 +13,14 @@ for cmd in pytest bc; do
 done
 
 # --- Configuration (adjust for your project) ---
-TEST_CMD="pytest --tb=no -q"
-COV_CMD="pytest --cov=src --cov-report=term-missing --tb=no -q"
-WEIGHT_PASS=0.6
-WEIGHT_COV=0.4
+test_cmd="pytest --tb=no -q"
+cov_cmd="pytest --cov=src --cov-report=term-missing --tb=no -q"
+weight_pass=0.6
+weight_cov=0.4
 # ------------------------------------------------
 
 # Measure pass rate
-test_output=$($TEST_CMD 2>&1) || true
+test_output=$($test_cmd 2>&1) || true
 passed=$(echo "$test_output" | grep -oE '[0-9]+ passed' | grep -oE '[0-9]+' | head -1 || true)
 passed=${passed:-0}
 failed=$(echo "$test_output" | grep -oE '[0-9]+ failed' | grep -oE '[0-9]+' | head -1 || true)
@@ -34,11 +34,11 @@ else
 fi
 
 # Measure coverage
-cov_output=$($COV_CMD 2>&1) || true
+cov_output=$($cov_cmd 2>&1) || true
 coverage=$(echo "$cov_output" | grep 'TOTAL' | grep -oE '[0-9]+%' | grep -oE '[0-9]+' || true)
 coverage=${coverage:-0}
 
 # Composite score
-score=$(echo "scale=1; $WEIGHT_PASS * $pass_pct + $WEIGHT_COV * $coverage" | bc)
+score=$(echo "scale=1; $weight_pass * $pass_pct + $weight_cov * $coverage" | bc)
 
 echo "$score"
