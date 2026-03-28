@@ -96,31 +96,7 @@ Scope tier rules:
   Context files: NEVER modify (read-only reference)
 ```
 
-### One-Sentence Test
-```
-Before writing code, state the hypothesis in one sentence:
-  "If I <change>, then <metric> should <improve/decrease> because <reason>"
-
-This sentence becomes the commit message description.
-```
-
-### Multi-File Atomicity
-```
-When a change spans multiple files:
-1. Plan all modifications before writing any
-2. Write all modifications
-3. Verify they compile/parse together
-4. Stage them all in one commit
-5. If any file modification fails, revert ALL of them
-```
-
-### Read Before Write
-```
-ALWAYS read the current file contents before modifying.
-NEVER assume contents from memory.
-Files may have changed from previous iterations.
-Always read from disk, not from memory.
-```
+Before writing code, state hypothesis: "If I <change>, then <metric> should <direction> because <reason>". This becomes the commit message. Multi-file changes: plan all → write all → verify together → stage in one commit. ALWAYS read files before modifying — never assume contents from memory.
 
 ---
 
@@ -138,29 +114,7 @@ git add <core_file1> <core_file2> <support_file1> ...
 git commit -m "experiment(<scope>): <one-sentence description>"
 ```
 
-### Commit Message Format
-```
-experiment(<scope>): <description>
-
-Where:
-  <scope> = the primary file or module being modified
-  <description> = the one-sentence hypothesis from Phase 3
-
-Examples:
-  experiment(parser.py): add input length validation to reduce error rate
-  experiment(test_api.ts): add timeout tests for connection handler
-  experiment(styles.css): reduce specificity to decrease bundle size
-```
-
-### Hook Failure Handling
-```
-If pre-commit hook fails:
-1. Read the hook error output
-2. Fix the issue (formatting, lint, type errors)
-3. Stage the fixes
-4. Create a NEW commit (never amend — amend would modify the previous iteration's commit)
-5. If hook fails 3 times: log as "hook-blocked", revert, continue to next iteration
-```
+Format: `experiment(<scope>): <description>`. Hook failure: read error, fix issue, stage, NEW commit (never amend). 3 failures → `hook-blocked`, revert, continue.
 
 ---
 
@@ -168,58 +122,7 @@ If pre-commit hook fails:
 
 Run the mechanical metric extraction command. PURE MEASUREMENT — no judgment.
 
-### Execution
-```bash
-# Run the verify command
-output=$(eval "$verify_cmd" 2>&1)
-exit_code=$?
-
-# Extract the metric (a single number) from the output
-if [ -n "$metric_extraction" ]; then
-    # User-provided extraction pipeline
-    metric=$(echo "$output" | eval "$metric_extraction")
-else
-    # Auto-extract: last number from the output
-    metric=$(echo "$output" | grep -oE '[0-9]+\.?[0-9]*' | tail -1)
-fi
-```
-
-### Timeout Rules
-```
-Default timeout: 5 minutes (300 seconds)
-For ML domains: configurable up to 30 minutes
-For fast domains (content, config): 1 minute
-
-If command times out:
-  1. Kill the process
-  2. Status = "crash"
-  3. Proceed to Phase 6 (Decide) with crash handling
-```
-
-### Metric Extraction
-```
-The verify command MUST produce output containing a number.
-
-If metric_extraction is provided:
-  Apply the user's extraction pipeline to verify output.
-
-If metric_extraction is null (auto-extract):
-  Strategy: extract ALL numbers from the full output, take the LAST one.
-  Command: grep -oE '[0-9]+\.?[0-9]*' | tail -1
-  1. If output is a single number, use it directly
-  2. If output contains multiple numbers, use the LAST match across all lines
-  3. If no number found, status = "crash" with note "metric extraction failed"
-
-NEVER interpret non-numeric output as a metric.
-NEVER use subjective assessment as a metric.
-```
-
-### Exit Code Handling
-```
-exit_code == 0: Normal, extract metric
-exit_code != 0 AND metric extractable: Use the metric (some test runners exit non-zero on failures)
-exit_code != 0 AND no metric: Status = "crash"
-```
+Run `verify_cmd`, extract metric via `metric_extraction` pipeline (or auto-extract last number: `grep -oE '[0-9]+\.?[0-9]*' | tail -1`). No number found → crash. Exit code != 0 but metric extractable → use it. Timeout: 5min default (30min ML, 1min fast). Timeout → crash.
 
 ---
 
