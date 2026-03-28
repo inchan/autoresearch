@@ -1,7 +1,13 @@
+# Autoresearch working files (never committed)
 autoresearch-results.tsv
 autoresearch-state.json
 autoresearch-state.json.tmp
 autoresearch-lessons.md
+
+# Meta-metric (self-critique dev tool, not part of skill)
+scripts/metric-self-critique.sh
+
+# Temp/backup
 *.tmp
 *.bak
 *.prev
