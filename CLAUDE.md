@@ -24,15 +24,13 @@ Three-file architecture: `prepare.py` (fixed eval, read-only), `train.py` (agent
 
 ## Architecture
 
-This is a Claude Code plugin with slash commands and skills.
+This is a Claude Code plugin with skills.
 
 ```
 .claude-plugin/
   plugin.json                 # Plugin manifest (name, version, metadata)
 .claude/
   settings.json               # Project-level Claude Code settings
-commands/                     # Slash command entry point
-  autoresearch.md             # /autoresearch [mode] — unified entry point with mode routing
 skills/                       # Skills (plugin root)
   autoresearch/
     SKILL.md                  # Main skill definition + mode routing table
@@ -57,7 +55,7 @@ skills/                       # Skills (plugin root)
 
 ### Key Design Decisions
 
-- **Single command, mode routing** — one command file dispatches to the correct references via SKILL.md mode routing table
+- **Single skill, mode routing** — SKILL.md dispatches to the correct references via mode routing table
 - **References are loaded on-demand** — keeps context window lean; only load what the current mode needs
 - **State is file-based** — `autoresearch-results.tsv` (append-only log) + `autoresearch-state.json` (atomic snapshot). Both gitignored, never committed
 - **Git is the primary memory** — agent reads `git log` and `git diff` every iteration to learn from past experiments. `git revert` preferred over `git reset --hard` to preserve history
@@ -100,13 +98,6 @@ Install the plugin for local development:
 ln -sf "$(pwd)" ~/.claude/plugins/autoresearch-dev
 ```
 
-Or copy commands to a test project:
-
-```bash
-# Copy commands to project-level .claude/commands/
-cp -r commands/ /path/to/test-project/.claude/commands/
-```
-
 ### Validating skill structure
 
 ```bash
@@ -114,9 +105,6 @@ cp -r commands/ /path/to/test-project/.claude/commands/
 grep -roh 'references/[a-z-]*.md' skills/autoresearch/SKILL.md | sort -u | while read f; do
   test -f "skills/autoresearch/$f" || echo "MISSING: $f"
 done
-
-# Verify command files reference SKILL.md correctly
-grep -l "SKILL.md\|skills/autoresearch" commands/autoresearch.md commands/autoresearch/*.md
 ```
 
 ### Testing the loop
