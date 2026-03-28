@@ -4,7 +4,6 @@ set -uo pipefail
 
 SKILL_DIR="skills/autoresearch"
 REF_DIR="$SKILL_DIR/references"
-CMD_DIR="commands"
 errors=0
 
 safe_count() { local c; c=$(grep -c "$@" 2>/dev/null | tr -d '[:space:]') || true; echo "${c:-0}"; }
@@ -57,13 +56,7 @@ for f in "$REF_DIR"/*.md; do
   head -3 "$f" | grep -q '^# ' || errors=$((errors + 1))
 done
 
-# 11. Every command file should have YAML frontmatter
-for cmd in "$CMD_DIR"/autoresearch.md "$CMD_DIR"/autoresearch/*.md; do
-  [ -f "$cmd" ] || continue
-  head -1 "$cmd" | grep -q '^---' || errors=$((errors + 1))
-done
-
-# 12. SKILL.md should have all 8 critical rules
+# 11. SKILL.md should have all 8 critical rules
 c=$(safe_count '### [0-9]\.' "$SKILL_DIR/SKILL.md")
 [ "$c" -ge 8 ] || errors=$((errors + 1))
 

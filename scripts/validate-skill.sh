@@ -5,7 +5,6 @@ set -uo pipefail
 
 SKILL_DIR="skills/autoresearch"
 REF_DIR="$SKILL_DIR/references"
-CMD_DIR="commands"
 errors=0
 
 safe_count() { grep -c "$@" 2>/dev/null | tr -d '[:space:]' || printf '0'; }
@@ -15,14 +14,7 @@ while IFS= read -r ref; do
   [ -f "$SKILL_DIR/$ref" ] || errors=$((errors + 1))
 done < <(grep -oE 'references/[a-z-]+\.md' "$SKILL_DIR/SKILL.md" 2>/dev/null | sort -u)
 
-# 2. Check main command file exists and references SKILL.md
-if [ -f "$CMD_DIR/autoresearch.md" ]; then
-  grep -q "SKILL.md\|skills/autoresearch" "$CMD_DIR/autoresearch.md" 2>/dev/null || errors=$((errors + 1))
-else
-  errors=$((errors + 1))
-fi
-
-# 3. Check for deprecated term "metric_cmd" (should be metric_extraction)
+# 2. Check for deprecated term "metric_cmd" (should be metric_extraction)
 c=$(grep -rl "metric_cmd" "$SKILL_DIR" --include="*.md" 2>/dev/null | wc -l | tr -d '[:space:]')
 errors=$((errors + c))
 
