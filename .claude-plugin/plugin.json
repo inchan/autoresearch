@@ -1,6 +1,6 @@
 {
   "name": "autoresearch",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Autonomous goal-directed iteration — modify, verify, keep/discard, repeat. Generalizes Karpathy's autoresearch pattern into a Claude Code skill for any domain with a measurable metric.",
   "author": {
     "name": "inchan"

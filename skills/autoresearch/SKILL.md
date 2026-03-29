@@ -1,7 +1,7 @@
 ---
 name: autoresearch
 description: Autonomous Goal-directed Iteration — modify, verify, keep/discard, repeat
-version: 1.0.0
+version: 0.0.1
 ---
 
 # Autoresearch
