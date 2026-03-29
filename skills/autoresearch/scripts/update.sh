@@ -31,6 +31,14 @@ find_local_version() {
 
 # --- Fetch latest version from GitHub ---
 fetch_remote_version() {
+  # Prefer gh API (authenticated, no rate limit issues)
+  if command -v gh &>/dev/null; then
+    gh api "repos/$REPO/contents/$VERSION_PATH" --jq '.content' 2>/dev/null \
+      | base64 -d 2>/dev/null | tr -d '[:space:]'
+    return
+  fi
+
+  # Fallback: raw URL
   if command -v curl &>/dev/null; then
     curl -fsSL "$RAW_URL" 2>/dev/null | tr -d '[:space:]'
   elif command -v wget &>/dev/null; then
