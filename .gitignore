@@ -12,3 +12,8 @@ scripts/metric-self-critique.sh
 *.bak
 *.prev
 .DS_Store
+
+# npx skills installation artifacts
+.agents/
+.claude/skills/
+skills-lock.json

@@ -24,6 +24,17 @@ The first argument determines the operating mode. If no mode is given, default t
 | `fix` | `references/fix-workflow.md` + `references/results-logging.md` | Iterative error repair |
 | `security` | `references/security-workflow.md` + `references/results-logging.md` | STRIDE + OWASP security audit |
 | `ship` | `references/ship-workflow.md` + `references/results-logging.md` | Universal shipping workflow |
+| `update` | *(none)* | Check for updates and install latest version |
+| `update install` | *(none)* | Install the latest version |
+
+When mode is `update` or `update install`, skip all setup gates. Run the update script:
+
+```bash
+bash "$(dirname "${SKILL_FILE}")/scripts/update.sh" check   # for "update"
+bash "$(dirname "${SKILL_FILE}")/scripts/update.sh" install  # for "update install"
+```
+
+Show the output to the user verbatim. No further action needed.
 
 Supporting protocols (loaded on-demand):
 
