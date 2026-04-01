@@ -36,7 +36,14 @@ bash "$(dirname "${SKILL_FILE}")/scripts/update.sh" install  # for "update insta
 
 Show the output to the user verbatim. No further action needed.
 
-On-demand: `references/metric-design.md`, `references/pivot-protocol.md`, `references/session-resume.md`, `references/lessons-protocol.md`.
+Supporting protocols (loaded on-demand):
+
+| Reference | When loaded |
+|---|---|
+| `references/metric-design.md` | During setup (metric selection) and when metric issues arise |
+| `references/pivot-protocol.md` | When consecutive discards accumulate |
+| `references/session-resume.md` | When resuming a previous run |
+| `references/lessons-protocol.md` | At run start and during ideation |
 
 ---
 
@@ -59,7 +66,12 @@ Before entering the autonomous loop, ALL five configuration parameters MUST be p
 |---|---|---|---|
 | **Metric** | Extraction pipeline applied to Verify output to produce a single number | Auto-extract last number from Verify output | `grep -c passed` |
 
-Metric extracts a number from Verify output: `eval "$verify_cmd" 2>&1 | $metric_extraction`. Default auto-extract: `grep -oE '[0-9]+\.?[0-9]*' | tail -1`.
+**Metric vs Verify relationship:**
+- **Verify** = the command that runs. Its full output is used for context and error diagnosis.
+- **Metric** = how to extract the single optimization number from Verify's output. If omitted, the agent extracts the last number from the last line of Verify output.
+- When both are provided, the effective command is: `eval "$verify_cmd" 2>&1 | $metric_extraction`
+- When Metric is omitted, the agent uses: `eval "$verify_cmd" 2>&1 | grep -oE '[0-9]+\.?[0-9]*' | tail -1`
+- They CAN be merged into one command: if the user provides a Verify command that already outputs a single number, no separate Metric is needed.
 
 ### Optional Parameters
 
