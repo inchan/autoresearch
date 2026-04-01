@@ -92,34 +92,10 @@ git checkout HEAD -- $SCOPE_FILES   # ONLY scope files, never `git checkout -- .
 
 ---
 
-## Results Log Format
-
-**File:** `autoresearch-results.tsv` — append-only, tab-separated, gitignored.
-
-Header: `iteration	commit	metric	delta	guard	status	description`
-
-Statuses: `baseline` | `keep` | `keep (reworked)` | `discard` | `crash` | `no-op` | `hook-blocked`
-
-At Review, extract: current best, trend, consecutive discards, strategy patterns.
-
----
-
 ## State File Update (STEP 3)
 
 Write `autoresearch-state.json` atomically (tmp + rename) after every iteration:
 `iteration`, `metric`, `consecutive_discards`, `pivot_count`, `last_status`, `updated_at`.
-
----
-
-## Core Principles (guiding all decisions)
-
-1. **One metric** drives ALL decisions. No ambiguity.
-2. **Mechanical measurement** only — no subjective judgment.
-3. **Fast verification** enables more iterations. < 30s ideal.
-4. **Commit before verify** — enables clean rollback.
-5. **Simplicity wins** — same metric + less code = keep.
-6. **Git is memory** — `git log` is the primary context source.
-7. **Bold experiments are cheap** — they cost exactly one iteration if they fail.
 
 ---
 
