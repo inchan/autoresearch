@@ -275,37 +275,15 @@ Persist every iteration without exception — even on crash or discard.
 
 ---
 
-## Phase 8: Repeat — MANDATORY BRIDGE ACTION
-
-After Phase 7, your IMMEDIATE next action is a tool call. Not text. Not a summary. A tool call.
-
-### The Bridge Action
-
-```
-1. Increment iteration counter
-2. IMMEDIATELY execute: git log --oneline -5
-   → This tool call IS the start of Phase 1 for the next iteration
-3. You are now in Phase 1. Continue the protocol from Review.
-```
-
-The bridge action eliminates the natural stopping point between iterations. There is no gap — the git log command transitions you directly into Phase 1.
-
-### Self-Check Before Any Text Output After Phase 7
-
-If you are about to output text after Phase 7, ask yourself:
-- Am I summarizing results? → STOP. Execute `git log --oneline -5`.
-- Am I asking the user something? → STOP. Execute `git log --oneline -5`.
-- Am I suggesting to stop? → STOP. Execute `git log --oneline -5`.
-- Am I saying "iteration complete"? → STOP. Execute `git log --oneline -5`.
-
-The ONLY text permitted between iterations is the 1-line status:
-`[autoresearch] iter N/∞ | metric: X (±Y) | K:a D:b`
+## Phase 8: Repeat
 
 ### Unbounded Mode
 ```
-NEVER STOP. NEVER ask "should I continue?"
-NEVER output a summary until the user interrupts.
-After Phase 7, execute the Bridge Action. No exceptions.
+NEVER STOP.
+NEVER ask "should I continue?"
+NEVER print "I'll stop here unless you want me to continue."
+Increment iteration counter and return to Phase 1.
+The loop runs until the user interrupts (Ctrl+C / Escape).
 ```
 
 ### Bounded Mode
@@ -315,7 +293,8 @@ if iteration >= max_iterations:
     extract_lessons()
     stop
 else:
-    Execute the Bridge Action. No exceptions.
+    increment iteration
+    return to Phase 1
 ```
 
 ### Context Checkpoint (Before Phase 1)
@@ -327,8 +306,8 @@ If context window is ~80% full (agent-specific detection):
   3. Graceful exit — do NOT continue with degraded context
   4. The next session auto-resumes via state file
 
-Context checkpoint is the ONLY valid reason to stop in unbounded mode.
-"Enough progress" is NOT valid. "First iteration succeeded" is NOT valid.
+This prevents mid-iteration corruption from context overflow.
+The state file is the contract between sessions — always keep it current.
 ```
 
 ### When Stuck (>5 Consecutive Discards)
