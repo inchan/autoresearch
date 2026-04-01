@@ -83,68 +83,15 @@ Before entering the autonomous loop, ALL five configuration parameters MUST be p
 | **Guard** | Shell command returning 0 on pass | None |
 | **MinDelta** | Minimum metric change to count as improvement | 0 |
 
-### 3-Tier Scope Model
+### Scope Tiers
 
-The agent operates within a layered scope:
+- **Scope (Core)**: full read/write — where all experiments happen.
+- **Support**: limited write — only to enable Core changes (exports, types, imports). Auto-detected from Core imports if not specified.
+- **Context**: read-only — for understanding, never modified.
 
-```
-┌─────────────────────────────────────────────────┐
-│  Tier 1: Scope (Core)  — full read/write        │
-│  The primary files the agent modifies freely.    │
-│  All experiment changes happen here.             │
-│  Example: tests/*.py                             │
-├─────────────────────────────────────────────────┤
-│  Tier 2: Support       — limited write           │
-│  Files modified ONLY to enable Core changes.     │
-│  Allowed: add exports, adjust types, fix imports │
-│  Blocked: logic changes, feature changes         │
-│  Example: src/parser.py, src/utils.py            │
-├─────────────────────────────────────────────────┤
-│  Tier 3: Context       — read-only               │
-│  Files read for understanding but NEVER modified. │
-│  Used during Review and Ideate phases.           │
-│  Example: src/**/*.py, config/*, docs/*          │
-└─────────────────────────────────────────────────┘
-```
+### Missing Parameters
 
-**Tier 2 (Support) rules:**
-- Changes to Support files MUST be directly required by a Core change
-- Support changes are described as part of the same one-sentence hypothesis
-- Support changes are committed together with Core changes (one atomic commit)
-- If the experiment is discarded, Support changes are reverted along with Core
-- Support changes MUST NOT alter business logic — only interface/structural adjustments
-
-**Auto-detection during setup:**
-When Support is not specified, the agent analyzes Core scope files:
-1. Parse imports/requires/use statements in Core files
-2. Identify files outside Core that are imported
-3. Suggest these as Support scope
-4. User confirms or adjusts
-
-### Missing Parameter Protocol
-
-If ANY required parameter is missing from the invocation:
-
-1. Check if `autoresearch-state.json` exists for session resume (see `references/session-resume.md`)
-2. If no state file, prompt the user for EACH missing parameter using clear, specific questions
-3. Suggest reasonable defaults based on codebase analysis when possible
-4. Do NOT proceed to the loop until all five required parameters are confirmed
-
-Example interaction for missing parameters:
-```
-I need a few details before starting the autonomous loop:
-
-Goal: What are you trying to achieve? (e.g., "Reduce bundle size", "Increase test pass rate")
-Scope: Which files should I modify? (e.g., "src/**/*.ts", "lib/parser.py")
-Verify: What command runs verification? (e.g., "pytest --tb=short 2>&1")
-Direction: Should the metric go "higher" or "lower"?
-
-Optional (I'll auto-detect if omitted):
-Support: Files I can minimally adjust to support Scope changes? (e.g., "src/types.ts")
-Metric: How to extract the number from Verify output? (default: last number)
-```
-
-Once all parameters are confirmed, proceed to the Setup Phase. After setup completes and the user confirms, the agent becomes **fully autonomous**. NEVER pause mid-loop to ask questions.
+If any required parameter is missing: check `autoresearch-state.json` for session resume, then ask for each missing parameter. Do NOT enter the loop until all are confirmed. After confirmation, the agent becomes **fully autonomous**.
 
 ---
 
