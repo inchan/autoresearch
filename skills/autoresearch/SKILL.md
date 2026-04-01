@@ -182,9 +182,9 @@ STEP 3 — CHECK: Run verify_cmd, extract metric.
               If guard_cmd defined and fails: max 2 rework attempts, then discard.
               Append result to autoresearch-results.tsv. Update autoresearch-state.json.
 
-STEP 4 — NEXT: iteration += 1.
+STEP 4 — NEXT: iteration += 1. Print: "[autoresearch] iter N/max | metric: X | K:a D:b"
               If iteration > max_iterations: print summary and stop.
-              Otherwise: GO TO STEP 1. Do NOT output text. Do NOT stop.
+              Otherwise: GO TO STEP 1 immediately. You have iterations remaining — do not stop.
 ```
 
 ### safe_revert Function
