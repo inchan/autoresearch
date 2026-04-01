@@ -12,6 +12,21 @@ Autonomous goal-directed iteration for any domain with a measurable metric.
 
 ---
 
+## ⚠️ LOOP CONTINUATION — THE #1 RULE
+
+**After completing Phase 7 (Log), your IMMEDIATE next action is a tool call — not text output.**
+
+Execute `git log --oneline -5` immediately after logging. This is Phase 1 of the next iteration. There is no pause, no summary, no "should I continue?" between iterations. The loop is one continuous execution.
+
+**If you are about to output any of these, STOP and run `git log --oneline -5` instead:**
+- A summary of what was accomplished
+- "Should I continue?" or "Let me know if..."
+- "That concludes..." or "I'll stop here"
+- Final results before the iteration limit is reached
+- Any text that is not the 1-line status format
+
+---
+
 ## Mode Routing
 
 The first argument determines the operating mode. If no mode is given, default to the main autonomous loop.
@@ -311,10 +326,12 @@ while should_continue(iteration):
     Update autoresearch-state.json
     Extract lessons if applicable
 
-    # Phase 8: Repeat
+    # Phase 8: Repeat — MANDATORY BRIDGE ACTION
     iteration += 1
-    # NEVER ask "should I continue?"
-    # NEVER stop unless iterations limit reached or user interrupts
+    # Immediately execute: git log --oneline -5
+    # This tool call IS the start of Phase 1 for the next iteration.
+    # Do NOT output text. Do NOT summarize. Do NOT end your turn.
+    # NEVER stop unless: iterations limit reached OR user interrupts OR context ~80% full
 ```
 
 ### safe_revert Function
@@ -334,11 +351,15 @@ Never use `git checkout -- .` — it destroys unrelated working tree changes.
 
 These rules are non-negotiable. Violating any of them breaks the loop's correctness guarantees.
 
-### 1. Loop Until Done
+### 1. Loop Until Done (THE MOST IMPORTANT RULE)
+- After EVERY Phase 7, your next action MUST be a tool call (`git log --oneline -5`), never text output.
 - Unbounded mode: NEVER stop. NEVER ask "should I continue?" NEVER pause. NEVER halt. Run until interrupted.
 - Bounded mode: Run exactly N iterations, then stop and summarize.
-- The only valid stop conditions: iteration limit reached, user interrupt, context window full (trigger session split), unrecoverable crash.
+- The only valid stop conditions: iteration limit reached, user interrupt, context window ~80% full, unrecoverable crash.
 - Do not stop because "enough progress was made" — the user decides when to stop, not the agent.
+- Do not stop after the first iteration — one iteration is not a loop.
+- Do not stop after a successful keep — success means keep going.
+- Do not stop after a discard — failure means try something different.
 - If context window fills up, save state and exit cleanly — the next session resumes automatically.
 
 ### 2. Read Before Write
