@@ -1,341 +1,115 @@
 # Autonomous Loop Protocol
 
-Full 8-phase loop specification for the autoresearch autonomous iteration engine.
+Details that supplement the 4-step loop in SKILL.md.
 
 ---
 
-## Phase 0: Precondition Checks
+## Phase 0: Preconditions (run once before loop)
 
-Execute BEFORE entering the loop. All must pass.
-
-1. **Git state** — verify git repo exists (`git rev-parse --git-dir`). If not, `git init` and commit scope files (never `git add -A`)
-2. **Dirty tree** — if `git status --porcelain` is non-empty, ask user to commit or stash (setup only)
-3. **Hooks** — detect pre-commit hooks. NEVER use `--no-verify`; fix underlying issues
-4. **Gitignore** — ensure these are in `.gitignore`: `autoresearch-results.tsv`, `autoresearch-state.json`, `autoresearch-state.json.tmp`, `autoresearch-lessons.md`
-5. **Session resume** — if `autoresearch-state.json` exists, load `references/session-resume.md` and follow recovery matrix
+1. Verify git repo (`git rev-parse --git-dir`). If missing, `git init`.
+2. Dirty tree → ask user to commit or stash.
+3. Ensure `.gitignore` has: `autoresearch-results.tsv`, `autoresearch-state.json`, `autoresearch-state.json.tmp`, `autoresearch-lessons.md`.
+4. If `autoresearch-state.json` exists → load `references/session-resume.md` for recovery.
 
 ---
 
-## Phase 1: Review
+## Context-Efficient Reading (STEP 1)
 
-Read the current state of the world. This phase is PURE OBSERVATION — no modifications.
-
-### Read Scope Files (Context-Efficient)
-- **Iteration 1 or post-PIVOT**: read ALL Core scope files fully
-- **Iteration 2+**: read only changed files (`git diff HEAD~1 --name-only`), skip unchanged
-- **Support scope**: skim for interface/export changes only
-- **Context scope**: re-read only when hypothesis requires it
-
-### Read Results Log
-Read last 10-20 entries from `autoresearch-results.tsv`. Identify: current best, recent trend, consecutive discards.
-
-### Read Git History
-`git log --oneline -20` — note what worked, what didn't, patterns in successful changes.
-
-### Read Lessons
-If `autoresearch-lessons.md` exists, read lessons relevant to current goal. Prioritize recent over old.
+- **Iteration 1 or post-PIVOT**: read ALL scope files fully.
+- **Iteration 2+**: read only changed files (`git diff HEAD~1 --name-only`), skip unchanged.
+- Support scope: skim interfaces/exports only. Context scope: re-read only when needed.
 
 ---
 
-## Phase 2: Ideate
+## Hypothesis Priority (STEP 1)
 
-Select the next hypothesis. This is the STRATEGIC phase — reasoning about WHAT to try.
+1. **Exploit**: extend a recent keep strategy.
+2. **Explore**: try something new (check git log to confirm not tried before).
+3. **Combine**: merge two near-miss ideas.
+4. **Revisit**: retry discarded idea with a substantive twist. NEVER repeat exact same change.
 
-### Hypothesis Selection Priority
+---
 
-1. **Exploit** (if recent keeps exist): Extend or deepen a successful strategy.
-   - "Last iteration added 3 tests and improved coverage. Add 3 more similar tests."
+## Commit Format (STEP 2)
 
-2. **Explore** (default): Try something not yet attempted.
-   - Review git log to confirm the idea hasn't been tried before.
-   - Prefer ideas that are orthogonal to recent attempts.
-
-3. **Combine** (if multiple near-misses): Merge two ideas that each almost worked.
-   - "Idea A improved metric by 1 (below threshold). Idea B improved by 1. Try A+B together."
-
-4. **Revisit** (if running low on ideas): Retry a discarded idea with a meaningful twist.
-   - The twist MUST be substantive, not cosmetic.
-   - NEVER retry the exact same change.
-
-### Anti-Patterns to Avoid
-- Repeating a discarded change with no meaningful difference
-- Making changes outside the defined scope
-- Trying overly complex multi-part changes (split them)
-- Optimizing for the metric in ways that are clearly gaming it
-- Ignoring lessons from previous runs
-
-### Pivot Protocol Integration
 ```
-If consecutive_discards >= 3:
-  Load references/pivot-protocol.md
-  Follow escalation levels
-  Adjust ideation strategy accordingly
-```
-
----
-
-## Phase 3: Modify
-
-Make ONE atomic change. This is the TACTICAL phase — translating a hypothesis into code.
-
-### One Atomic Change
-```
-Rules:
-1. The change MUST be describable in ONE sentence
-2. If description needs "and", STOP — split into two iterations
-3. Multi-file changes are fine IF they form one logical unit
-   Example OK: "Add input validation to the parse function" (touches parser.py + test_parser.py)
-   Example NOT OK: "Add validation and refactor error handling" — two changes
-
-Scope tier rules:
-  Core files:    modify freely (this is where experiments happen)
-  Support files: modify ONLY to enable the Core change
-    Allowed: add/modify exports, adjust type signatures, add imports
-    Blocked: change business logic, restructure code, add features
-    The Support change must be the MINIMUM needed to unblock Core
-  Context files: NEVER modify (read-only reference)
-```
-
-Before writing code, state hypothesis: "If I <change>, then <metric> should <direction> because <reason>". This becomes the commit message. Multi-file changes: plan all → write all → verify together → stage in one commit. ALWAYS read files before modifying — never assume contents from memory.
-
----
-
-## Phase 4: Commit
-
-Commit BEFORE verification. This is essential for clean rollback.
-
-### Commit Protocol
-```bash
-# Stage ONLY modified Core + Support files — never use git add -A
-# Never stage Context files (they should never be modified)
-git add <core_file1> <core_file2> <support_file1> ...
-
-# Commit with experiment prefix
+git add <scope_files>   # NEVER git add -A
 git commit -m "experiment(<scope>): <one-sentence description>"
 ```
 
-Format: `experiment(<scope>): <description>`. Hook failure: read error, fix issue, stage, NEW commit (never amend). 3 failures → `hook-blocked`, revert, continue.
+Hook failure: read error, fix, re-stage, NEW commit (never amend). 3 failures → `hook-blocked`, revert, continue.
 
 ---
 
-## Phase 5: Verify
+## Metric Extraction (STEP 3)
 
-Run the mechanical metric extraction command. PURE MEASUREMENT — no judgment.
-
-Run `verify_cmd`, extract metric via `metric_extraction` pipeline (or auto-extract last number: `grep -oE '[0-9]+\.?[0-9]*' | tail -1`). No number found → crash. Exit code != 0 but metric extractable → use it. Timeout: 5min default (30min ML, 1min fast). Timeout → crash.
-
----
-
-## Phase 5.5: Guard
-
-Optional regression check. Only runs if `guard_cmd` is defined.
-
-### Execution
-```bash
-guard_output=$(eval "$guard_cmd" 2>&1)
-guard_exit=$?
-
-# Guard is pass/fail only
-guard_passed = (guard_exit == 0)
-```
-
-### Guard Failure Recovery
-```
-If guard fails:
-  rework_count = 0
-  while rework_count < 2:
-    1. Read guard output to understand the failure
-    2. Make a targeted fix (do NOT change the experiment, fix the regression)
-    3. Stage and commit: "experiment(<scope>): rework — fix <guard issue>"
-    4. Re-run guard_cmd
-    5. If guard passes: break, proceed with status "keep (reworked)"
-    6. rework_count += 1
-
-  If still failing after 2 reworks:
-    safe_revert() all commits since last known-good state
-    Status = "discard"
-    Note: "guard failure after 2 rework attempts"
-```
+Run `verify_cmd`, extract metric via `metric_extraction` pipeline.
+- Auto-extract: `grep -oE '[0-9]+\.?[0-9]*' | tail -1`
+- No number found → crash.
+- Exit code != 0 but metric extractable → use it.
+- Timeout: 5min default. Timeout → crash.
 
 ---
 
-## Phase 6: Decide
+## Guard Failure Recovery (STEP 3)
 
-Binary decision: keep or discard. No ambiguity.
+If `guard_cmd` defined and fails:
+1. Read guard output, make targeted fix.
+2. Commit: `experiment(<scope>): rework — fix <issue>`
+3. Re-run guard. If pass → keep (reworked).
+4. Max 2 rework attempts. Still failing → revert all, discard.
 
-### Decision Logic
+---
+
+## Decision Logic (STEP 3)
+
 ```python
-# Terminology:
-#   baseline     = the original metric at iteration 0 (never changes)
-#   current_best = the best metric achieved so far (updated on each keep)
-#   new_metric   = the metric from the current iteration
-
 def decide(new_metric, current_best, direction, min_delta, guard_passed, code_delta):
-    if crash or timeout:
-        return "crash", safe_revert()
+    if crash or timeout:      return "crash", safe_revert()
+    if not guard_passed:      return "discard", safe_revert()
 
-    if not guard_passed:
-        return "discard", safe_revert()
+    improved = (new_metric - current_best >= min_delta) if direction == "higher" \
+          else (current_best - new_metric >= min_delta)
 
-    if direction == "higher":
-        improved = (new_metric - current_best) >= min_delta
-    else:  # lower
-        improved = (current_best - new_metric) >= min_delta
-
-    if improved:
-        # Sanity check: anomalous jump detection
-        avg_delta = average(last_5_keep_deltas)  # 0 if no history
-        if avg_delta > 0 and abs(new_metric - current_best) > 3 * avg_delta:
-            # Re-verify to confirm this isn't measurement noise
-            confirmation = run_verify()
-            if abs(confirmation - new_metric) > min_delta:
-                new_metric = confirmation  # use confirmed value
-                # recalculate improved
-            else:
-                note = "anomalous delta confirmed"
-        return "keep", set_current_best(new_metric)
-
-    # Simplicity override: equal metric but simpler code
-    if abs(new_metric - current_best) < min_delta and code_delta < 0:
-        return "keep", set_current_best(new_metric)  # simplicity wins
-
+    if improved:              return "keep", set_current_best(new_metric)
+    if code_delta < 0:        return "keep", note("simplicity override")
     return "discard", safe_revert()
 ```
 
-### The safe_revert Function
+---
+
+## safe_revert()
+
 ```bash
-safe_revert() {
-    # Try clean revert first (preserves history)
-    if git revert HEAD --no-edit 2>/dev/null; then
-        return 0
-    fi
+# Try clean revert first (preserves history)
+git revert HEAD --no-edit 2>/dev/null && return 0
 
-    # Revert had conflicts — abort and use reset
-    git revert --abort 2>/dev/null
-
-    # Reset to before the experiment commit (soft: moves HEAD, unstages changes)
-    git reset HEAD~1
-
-    # Restore ONLY Core + Support scope files to their pre-experiment state
-    # Never use `git checkout -- .` — that destroys ALL working tree changes
-    git checkout HEAD -- $CORE_SCOPE_FILES $SUPPORT_SCOPE_FILES
-
-    # Verify scope files are clean
-    if git diff --name-only | grep -qF "$SCOPE_FILES"; then
-        # Scope files still dirty — something went wrong, log and continue
-        echo "[autoresearch] WARNING: scope files still dirty after revert"
-    fi
-}
-```
-
-### Simplicity Override
-```
-Conditions for simplicity override:
-1. Metric is unchanged (within min_delta tolerance)
-2. The change REDUCES total code in scope (net negative lines)
-3. The change does not remove functionality (no deleted tests, no removed features)
-
-When simplicity override triggers, log status as "keep" with note "simplicity override".
+# Revert conflicts — abort and reset
+git revert --abort 2>/dev/null
+git reset HEAD~1
+git checkout HEAD -- $SCOPE_FILES   # ONLY scope files, never `git checkout -- .`
 ```
 
 ---
 
-## Phase 7: Log
+## State File Update (STEP 3)
 
-Append results to the TSV log. See `references/results-logging.md` for full format.
-
-### Required Fields
-```
-iteration   commit_hash   metric   delta   guard   status   description
-```
-
-### Valid Statuses
-| Status | Meaning |
-|---|---|
-| `baseline` | Iteration 0, initial measurement |
-| `keep` | Metric improved, change preserved |
-| `keep (reworked)` | Metric improved after guard fix rework |
-| `discard` | Metric did not improve, change reverted |
-| `crash` | Verify command failed or timed out, change reverted |
-| `no-op` | No meaningful change was possible this iteration |
-| `hook-blocked` | Pre-commit hook prevented the commit after 3 retries |
-
-### State File Update
-```
-Write state after every iteration — this is the checkpoint that enables session resume.
-Update autoresearch-state.json atomically (write to .tmp, then rename):
-- state.iteration = current iteration number
-- state.metric = current metric value
-- state.consecutive_discards = current streak
-- state.pivot_count = current pivot count
-- state.last_status = status from this iteration
-- state.updated_at = ISO timestamp
-Persist every iteration without exception — even on crash or discard.
-```
+Write `autoresearch-state.json` atomically (tmp + rename) after every iteration:
+`iteration`, `metric`, `consecutive_discards`, `pivot_count`, `last_status`, `updated_at`.
 
 ---
 
-## Phase 8: Repeat
+## STEP 4: Loop Continuation
 
-### Unbounded Mode
-```
-NEVER STOP.
-NEVER ask "should I continue?"
-NEVER print "I'll stop here unless you want me to continue."
-Increment iteration counter and return to Phase 1.
-The loop runs until the user interrupts (Ctrl+C / Escape).
-```
+**Unbounded**: NEVER STOP. NEVER ask "should I continue?" Run until user interrupts or context ~80% full.
+**Bounded**: if `iteration >= max_iterations` → print summary (K/D/C, baseline→final, top 3 changes) and stop. Otherwise → GO TO STEP 1.
 
-### Bounded Mode
-```
-if iteration >= max_iterations:
-    print_final_summary()
-    extract_lessons()
-    stop
-else:
-    increment iteration
-    return to Phase 1
-```
-
-### Context Checkpoint (Before Phase 1)
-```
-Before starting the next iteration, check context budget:
-If context window is ~80% full (agent-specific detection):
-  1. Save state to autoresearch-state.json (emergency checkpoint)
-  2. Print: "[autoresearch] Context checkpoint at iteration N. State saved. Resume with: /autoresearch"
-  3. Graceful exit — do NOT continue with degraded context
-  4. The next session auto-resumes via state file
-
-This prevents mid-iteration corruption from context overflow.
-The state file is the contract between sessions — always keep it current.
-```
-
-### When Stuck (>5 Consecutive Discards)
-```
-1. Load references/pivot-protocol.md
-2. Follow escalation levels
-3. Consider:
-   - Are we measuring the right thing?
-   - Is the scope too narrow?
-   - Is there a fundamental barrier we're not seeing?
-4. NEVER give up. NEVER stop. Pivot and try again.
-5. If truly stuck after Level 4 escalation, make increasingly bold changes.
-```
+**Context checkpoint**: if ~80% full, save state and print: `[autoresearch] Context checkpoint at iteration N. Resume with: /autoresearch`
 
 ---
 
-## Communication Rules
+## Status Output (minimal — save context)
 
-- NEVER ask questions, request confirmation, or suggest stopping during the loop
-- Keep output minimal — every token consumes context window budget
-
-### Status Formats
-```
-Every 5 iterations (1 line):   [autoresearch] iter 15/∞ | metric: 87.3 (+12.1) | K:8 D:6 | streak: 2K
-Every 10 iterations (3 lines): [autoresearch] === 10-iter summary === best/baseline/top strategy
-On PIVOT (1 line):              [autoresearch] PIVOT@12: "old strategy" → "new strategy"
-On guard fail (1 line):         [autoresearch] guard fail@9, rework 1/2
-```
-
-### Completion (Bounded)
-Print: iteration breakdown (K/D/C), start→end metric with delta, top 3 changes, lessons, next steps.
+- Every 5 iters: `[autoresearch] iter N/∞ | metric: X (±Y) | K:a D:b`
+- On PIVOT: `[autoresearch] PIVOT@N: "old" → "new"`
+- NEVER ask questions or suggest stopping during the loop.
