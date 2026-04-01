@@ -18,7 +18,7 @@ The first argument determines the operating mode. If no mode is given, default t
 
 | Mode | References to load | Description |
 |---|---|---|
-| *(none)* | `references/autonomous-loop-protocol.md` + `references/results-logging.md` + `references/core-principles.md` | Main autonomous loop |
+| *(none)* | `references/autonomous-loop-protocol.md` | Main autonomous loop |
 | `plan` | `references/plan-workflow.md` | Interactive goal -> config wizard |
 | `debug` | `references/debug-workflow.md` + `references/results-logging.md` | Scientific debugging loop |
 | `fix` | `references/fix-workflow.md` + `references/results-logging.md` | Iterative error repair |
