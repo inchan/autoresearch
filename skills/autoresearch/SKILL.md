@@ -85,9 +85,41 @@ Before entering the autonomous loop, ALL five configuration parameters MUST be p
 
 ### 3-Tier Scope Model
 
-- **Scope (Core)**: full read/write — all experiments happen here.
-- **Support**: limited write — only to enable Core changes (add exports, types, imports). Never change business logic. Auto-detected from Core imports if not specified.
-- **Context**: read-only — for understanding, never modified.
+The agent operates within a layered scope:
+
+```
+┌─────────────────────────────────────────────────┐
+│  Tier 1: Scope (Core)  — full read/write        │
+│  The primary files the agent modifies freely.    │
+│  All experiment changes happen here.             │
+│  Example: tests/*.py                             │
+├─────────────────────────────────────────────────┤
+│  Tier 2: Support       — limited write           │
+│  Files modified ONLY to enable Core changes.     │
+│  Allowed: add exports, adjust types, fix imports │
+│  Blocked: logic changes, feature changes         │
+│  Example: src/parser.py, src/utils.py            │
+├─────────────────────────────────────────────────┤
+│  Tier 3: Context       — read-only               │
+│  Files read for understanding but NEVER modified. │
+│  Used during Review and Ideate phases.           │
+│  Example: src/**/*.py, config/*, docs/*          │
+└─────────────────────────────────────────────────┘
+```
+
+**Tier 2 (Support) rules:**
+- Changes to Support files MUST be directly required by a Core change
+- Support changes are described as part of the same one-sentence hypothesis
+- Support changes are committed together with Core changes (one atomic commit)
+- If the experiment is discarded, Support changes are reverted along with Core
+- Support changes MUST NOT alter business logic — only interface/structural adjustments
+
+**Auto-detection during setup:**
+When Support is not specified, the agent analyzes Core scope files:
+1. Parse imports/requires/use statements in Core files
+2. Identify files outside Core that are imported
+3. Suggest these as Support scope
+4. User confirms or adjusts
 
 ### Missing Parameter Protocol
 
