@@ -148,92 +148,12 @@ Once all parameters are confirmed, proceed to the Setup Phase. After setup compl
 
 ---
 
-## Setup Phase
+## Setup Phase (do quickly — save context budget for the loop)
 
-Execute these steps sequentially after all parameters are confirmed:
-
-### 1. Read Scope Files
-```
-Read every file matched by the Scope (Core) glob.
-Understand the codebase structure, conventions, and dependencies.
-Note: if scope matches >20 files, read the most important ones and skim the rest.
-
-If Context scope is defined, skim context files for understanding.
-```
-
-### 1.5. Analyze Dependencies and Auto-detect Support Scope
-```
-If Support scope is NOT specified by the user:
-  1. Parse import/require/use statements in Core scope files
-  2. Identify external files that Core files depend on
-  3. Suggest these as Support scope:
-     "Your scope files import from these files outside scope:
-       - src/parser.py (imported by tests/test_parser.py)
-       - src/utils.py (imported by tests/test_utils.py)
-      Add as Support scope? (allows minimal modifications like adding exports)"
-  4. User confirms or adjusts
-  5. If user declines, note that some experiments may hit scope boundaries
-
-If Support scope IS specified:
-  Read Support files for understanding (structure, exports, types)
-```
-
-### 2. Define Configuration
-```
-Assemble the full configuration object:
-- goal: <Goal text>
-- scope: <Scope glob (Core)>
-- support_scope: <Support glob or null>
-- context_scope: <Context glob or null>
-- verify_cmd: <Verify command>
-- metric_extraction: <Metric extraction pipeline or null for auto-extract>
-- direction: <higher|lower>
-- guard_cmd: <Guard command or null>
-- iterations: <N or null for unbounded>
-- min_delta: <MinDelta or 0>
-- metric_type: <direct|proxy|composite>
-- run_tag: autoresearch-<timestamp>
-```
-
-### 3. Create Results Log
-```
-If autoresearch-results.tsv does not exist, create it with the TSV header.
-See references/results-logging.md for exact format.
-```
-
-### 4. Check for Lessons
-```
-If autoresearch-lessons.md exists, read it.
-Extract applicable lessons for the current goal and scope.
-See references/lessons-protocol.md for details.
-```
-
-### 5. Establish Baseline
-```
-Run the Verify command to capture the starting metric value.
-Log iteration 0 as status "baseline" in the results TSV.
-Commit a snapshot if the working tree is dirty: "experiment(<scope>): baseline snapshot"
-```
-
-### 6. Write State File
-```
-Write autoresearch-state.json with full configuration and initial state.
-See references/session-resume.md for schema.
-```
-
-### 7. Confirm and Go
-```
-Display a summary:
-  Goal: ...
-  Scope: ...
-  Metric: ... (baseline: <value>)
-  Direction: ...
-  Verify: ...
-  Guard: ...
-  Iterations: N or unbounded
-
-Then say: "Starting autonomous loop. I will not ask further questions."
-```
+1. **Read** scope files. If Support scope not specified, auto-detect from imports and confirm.
+2. **Baseline**: run verify_cmd, extract metric, log as iteration 0 in `autoresearch-results.tsv`.
+3. **State**: write `autoresearch-state.json` with config + initial state.
+4. **Confirm**: display 1-line summary → "Starting autonomous loop. I will not ask further questions."
 
 ---
 
