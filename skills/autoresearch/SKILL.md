@@ -239,82 +239,32 @@ Then say: "Starting autonomous loop. I will not ask further questions."
 
 ## The Autonomous Loop
 
-After setup, execute the 8-phase loop. Full protocol details in `references/autonomous-loop-protocol.md`.
+After setup, execute this loop. Each iteration has 4 steps. Full details in `references/autonomous-loop-protocol.md`.
 
-### Loop Pseudocode
+**IMPORTANT: This is a loop. You execute Steps 1-4 repeatedly until the iteration limit is reached. Do NOT stop after one iteration.**
+
+### Loop Steps (execute repeatedly)
 
 ```
 iteration = 1
-consecutive_discards = 0
-pivot_count = 0
 
-while should_continue(iteration):
+STEP 1 — PLAN: Read git log --oneline -10, read scope files (changed only after iter 1), read results log tail.
+             Pick next hypothesis: Exploit recent keeps > Explore new ideas > Combine near-misses.
+             If 3+ consecutive discards: REFINE. If 5+: PIVOT (see references/pivot-protocol.md).
 
-    # Phase 1: Review
-    Read scope files (latest versions)
-    Read results log tail (last 10 entries)
-    Read recent git history (last 10 commits)
-    Read lessons if available
+STEP 2 — DO:  Make ONE atomic change (describable in one sentence).
+             git add <scope files> && git commit -m "experiment(<scope>): <description>"
 
-    # Phase 2: Ideate
-    Select next hypothesis using priority order:
-      1. Exploit: extend/deepen a recent "keep" strategy
-      2. Explore: try something new not yet attempted
-      3. Combine: merge two near-miss ideas
-      4. Revisit: retry a discarded idea with a twist
-    Check pivot-protocol:
-      3+ consecutive discards -> REFINE (adjust within current strategy)
-      5+ consecutive discards -> PIVOT (abandon strategy entirely)
+STEP 3 — CHECK: Run verify_cmd, extract metric.
+              If improved: keep (update current_best).
+              If equal + simpler code: keep (simplicity override).
+              If no improvement or crash: git revert HEAD --no-edit, mark discard.
+              If guard_cmd defined and fails: max 2 rework attempts, then discard.
+              Append result to autoresearch-results.tsv. Update autoresearch-state.json.
 
-    # Phase 3: Modify
-    Make ONE atomic change to scope files
-    The change MUST be describable in one sentence
-    If description needs "and", split into two iterations
-
-    # Phase 4: Commit
-    Stage only modified scope files (never git add -A)
-    Commit: "experiment(<scope>): <one-sentence description>"
-    If pre-commit hook fails: fix the issue, re-stage, NEW commit
-
-    # Phase 5: Verify
-    Run verify_cmd
-    Extract numeric metric from output
-    Timeout: 5 minutes max (configurable)
-
-    # Phase 5.5: Guard (if guard_cmd defined)
-    Run guard_cmd
-    If exit code != 0: mark as guard failure
-    Max 2 rework attempts before discard
-
-    # Phase 6: Decide
-    # Terminology: baseline = original start value, current_best = best metric so far
-    delta = new_metric - current_best (adjusted for direction)
-    if metric improved by >= min_delta AND guard passed:
-        STATUS = "keep"
-        consecutive_discards = 0
-        pivot_count = 0
-        current_best = new_metric
-    elif metric unchanged AND code is simpler:
-        STATUS = "keep" (simplicity override)
-        consecutive_discards = 0
-    elif crash or timeout:
-        STATUS = "crash"
-        safe_revert()
-        consecutive_discards += 1
-    else:
-        STATUS = "discard"
-        safe_revert()
-        consecutive_discards += 1
-
-    # Phase 7: Log
-    Append to autoresearch-results.tsv
-    Update autoresearch-state.json
-    Extract lessons if applicable
-
-    # Phase 8: Repeat
-    iteration += 1
-    # NEVER ask "should I continue?"
-    # NEVER stop unless iterations limit reached or user interrupts
+STEP 4 — NEXT: iteration += 1.
+              If iteration > max_iterations: print summary and stop.
+              Otherwise: GO TO STEP 1. Do NOT output text. Do NOT stop.
 ```
 
 ### safe_revert Function
