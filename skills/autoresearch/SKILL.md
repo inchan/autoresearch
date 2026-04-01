@@ -311,10 +311,10 @@ while should_continue(iteration):
     Update autoresearch-state.json
     Extract lessons if applicable
 
-    # Phase 8: Repeat
+    # Phase 8: Repeat — immediately run `git log --oneline -5` to start next iteration
     iteration += 1
-    # NEVER ask "should I continue?"
-    # NEVER stop unless iterations limit reached or user interrupts
+    # Your next tool call MUST be `git log --oneline -5` (Phase 1 of next iteration)
+    # Do NOT output text between iterations — go straight to the tool call
 ```
 
 ### safe_revert Function
